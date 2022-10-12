@@ -1,0 +1,2060 @@
+\documentclass[11pt,titlepage]{article}
+\usepackage{amsmath,amssymb,amstext,mathtools,amsthm,mathrsfs,stmaryrd}
+\usepackage{xcolor}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+%\usepackage[paper=a4paper,left=25mm,right=25mm,top=25mm,bottom=25mm]{geometry}
+\usepackage[twoside,lmargin=3.5cm,rmargin=2.5cm]{geometry}
+\usepackage{hyperref}
+\hypersetup{bookmarksnumbered}
+\usepackage{booktabs}
+
+\usepackage{dsfont}
+%\usepackage{xfrac}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{bigints}
+\usepackage{bibgerm}
+\usepackage[onehalfspacing]{setspace}
+\usepackage{xcolor}
+\usepackage[framemethod,tikz]{mdframed}
+\usepackage{algorithmic, algorithm2e, float}
+\usepackage{hhline}
+
+\usetikzlibrary{shadows}
+\usetikzlibrary{positioning}
+%\usetikzlibrary{arrows}
+
+\newcommand{\C}{\mathbb{C}} % komplexe
+\newcommand{\R}{\mathbb{R}} % reelle
+\newcommand{\Q}{\mathbb{Q}} % rationale
+\newcommand{\Z}{\mathbb{Z}} % ganze
+\newcommand{\N}{\mathbb{N}} % natuerliche
+\newcommand{\E}{\mathbb{E}} % Erwartungswert
+\newcommand{\V}{\mathbb{V}} % Varianz
+\newcommand{\F}{\mathcal{F}} %Funktionenfamilie
+\newcommand{\G}{\mathcal{G}} 
+\newcommand{\X}{\mathcal{X}} %Räume
+\newcommand{\Y}{\mathcal{Y}}
+\newcommand{\abs}[1]{{\left| #1 \right|}}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem*{axiom}{Axiom}
+\newtheorem{remark}[theorem]{Remark}
+
+\theoremstyle{remark}
+\newtheorem*{repetition}{Repetition}
+
+\newtheorem{question}{Frage}[section]
+\newtheorem*{remind}{Erinnerung}
+\newcounter{Frage}[section]
+
+\allowdisplaybreaks[3] %Erlaubt es lange Gleichungen zu trennen auf mehrere Seiten
+
+\mdfdefinestyle{inner}{outerlinewidth=0.5pt,innerlinewidth=0.5pt,innerlinecolor=black,outerlinecolor=black,roundcorner=5pt,linecolor=black}
+
+
+\begin{document}
+
+	\setlength{\parindent}{0em}
+	\onehalfspacing
+	\begin{titlepage}
+		\begin{center}
+			\huge\textbf{Modeling of Stochastic Differential Equations in Combination 
+			with Autoencoders}\\
+			\vspace{1.2cm}
+			\LARGE\textbf{{Jannis Klingler}}\\
+			\vspace{0.5cm}
+			\LARGE\textbf{{Masterarbeit}}\\
+			\vspace{0.5cm}
+			\normalsize
+			Zur Erlangung des akademischen Grades\\
+			Master of Science\\
+			\vspace{0.3cm}
+			vorgelegt am 12. Oktober 2022 \\
+			\vspace{0.7cm}
+			
+			\begin{figure}[h!]
+				\centering
+				\includegraphics[scale=0.07]{UniFreiburgLogo.png}
+			\end{figure}
+			
+			\vspace{0.7cm}
+			\large \textbf{Albert-Ludwigs-Universität Freiburg}\\
+			\vspace{0.2cm}
+			\large {Institut für Mathematik und Physik}\\
+			\large {Betreuung: Prof. Dr. Harald Binder}\\
+			\vspace{1.8cm}
+		\end{center}
+	\end{titlepage}
+	
+	\thispagestyle{empty}
+	\vspace*{17cm}
+	\begin{tabular}{ll}
+		Vorgelegt von: & Jannis Klingler \\
+		& Sundgauallee 42\\
+		& 79110 Freiburg im Breisgau
+		\\
+		& jannis-klingler@web.de\\
+		Matrikelnummer: & {4331982} \\
+		Studiengang: & {M. Sc. Mathematik}\\
+		Bearbeitungszeitraum: & {12.04.2022 bis 12.10.2022} \\
+	\end{tabular}\\
+	
+	\thispagestyle{empty}
+		\vspace*{1cm}
+		\LARGE\textsc{Erklärung zur Masterarbeit}
+		
+		\vspace{1.5cm}
+		
+		\normalsize 
+		Hiermit versichere ich, dass die vorliegende Arbeit von mir selbstständig verfasst wurde und dass keine anderen als die angegebenen Quellen und Hilfsmittel benutzt wurden.\\ Sämtliche Stellen der Arbeit, die im Wortlaut oder dem Sinn nach Publikationen anderer Autoren entsprechen, wurden gekennzeichnet.\\
+		Diese Erklärung bezieht sich auch auf in der Arbeit enthaltene Grafiken und bildliche Darstellungen.\\
+		Darüber hinaus versichere ich, dass diese Arbeit nicht und auch nicht auszugsweise bereits für eine andere Prüfung angefertigt wurde. 
+		\ \\
+		\ \\
+		\ \\
+		\begin{minipage}{0.57\textwidth}
+			\begin{tabular}{@{}l@{}}\hline
+				Datum, Ort \hspace{4.2cm}
+			\end{tabular}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.43\textwidth} 
+			\begin{tabular}{@{}l@{}}\hline
+				Unterschrift \hspace{4.2cm}
+			\end{tabular}
+		\end{minipage}
+		
+	\newpage  \
+	\thispagestyle{empty}
+	
+	\newpage  \
+	\thispagestyle{empty}
+	
+	\tableofcontents
+	
+	\newpage
+	\thispagestyle{empty}
+	\ 
+	\newpage
+	
+	\setcounter{page}{1}
+	
+	\section*{Introduction}
+	\addcontentsline{toc}{section}{Introduction}
+	
+	Medical time series data, as well as clinical cohort studies, often exhibit certain stochasticity over time. Therefore, it is useful to model such data in a way that takes this stochasticity into account. However, the study of data including individual development patterns is complicated by the often highly irregular time structure of the data. 
+	An example is the \textsl{SMArtCARE} dataset containing observations of the motor skills of patients suffering from spinal muscular atrophy. The given data shows that patients' motor skills do not further improve after diagnosis. Moreover, the measured values are present only at specific points in time with individual frequency for each patient. 
+	Since the development of a patient’s condition is uncertain, stochasticity must be taken into account. For a general analysis, it is then 
+	possible to group patients based on age and severity of their symptoms. Additionally, on an 
+	individual level it is possible to determine certain baseline variables that characterize the 
+	development of a patient’s condition.\\
+	This thesis is motivated by the analysis of data sets such as SMArtCARE. The aim of this analysis is to learn underlying individual development patterns of the data. Using the additional baseline variables, the group structure of the individuals can be learned and the individual development of the time series can be characterized. Since medical data sets are often extensive, machine learning 
+	tools like an autoencoder can be used to reduce the dimension of the given data and to 
+	obtain a lower-dimensional representation of the initially high-dimensional trajectories. This new data can be examined with less effort.\\
+	The work of Chen \cite{Chen2018neural} and Yildiz \cite{Yildiz2019ode2vae} showed that in the analysis of data exhibiting latent development patterns it is useful to assume that there exists an underlying dynamical system of the data which can be modeled by an ordinary differential equation. Hackenberg \cite{Hackenberg2022} demonstrated that dynamic modeling can be useful even in an extreme situation in which only baseline characterizations and one other observation point are available. This thesis builds in parts on  Hackenberg's work and attempts to incorporate stochasticity modeling in the analysis of sparse data. We assume that latent evolution can be described in terms of a stochastic differential equation and focus particularly on Ornstein-Uhlenbeck processes. 
+	\newpage
+	In the first chapter of this thesis we will discuss the theoretical background which is necessary to formulate the applied methods. We will consider neural networks and examine under which conditions they can be used as universal function approximators and how to iteravely update them until we reach a certain accuracy. Furthermore, we will derive the stochastic integral for continuous processes in order to discuss stochastic differential equations. Finally, we will define the Ornstein-Uhlenbeck process and consider its properties.
+	In the second chapter the focus will be on the methods that are later used for the analysis of the given data. In the setting of this thesis, we introduce three methods for this analysis. The knowledge gained from the application of each of these methods is incorporated in the subsequent methods. The Euler-Maruyama method aims to approximate the latent underlying process using the Euler-Maruyama approximation  for stochastic differential equations. The covariance loss method splits the learning of drift and diffusion parameters of the process into different loss functions. The third and main method of this thesis is the Fokker-Planck method. In this method we exploit properties of the Ornstein-Uhlenbeck process to obtain the parameters of the underlying Ornstein-Uhlenbeck process using the baseline variables. 
+	The goal is to learn the empirical distribution of the data. 
+	After having developed these methods, they will be tested on a suitable simulation design in the third chapter. For this purpose we will generate a data set which is kept as simple as possible but still satisfies the requirements mentioned before. This data set is inspired by the data of the SMArtCARE database.
+	
+	\newpage
+	
+	\section{Background} \label{sec_Background}
+	
+	This chapter focuses on the mathematical background for the methods that will be developed in chapter \ref{sec methods}. We first discuss the machine learning concepts that we will use. For this purpose, we introduce neural networks and define autoencoders. We show under what conditions arbitrary functions can be approximated using neural networks and go into more detail about the training of these. Second, we give a short introduction of the stochastic integral for continuous processes in order to be able to define stochastic differential equations. The goal is to define the Ornstein-Uhlenbeck process which is relevant for the methods that will be developed in chapter \ref{sec methods}. We show that an Ornstein-Uhlenbeck process exists and that it is unique. Further, we show that it is a time-homogeneous normally distributed Markov process. In order to compute the distribution of the Ornstein-Uhlenbeck process we choose an alternative way using the Fokker-Planck equation compared to the conventional computation of its distribution.
+	
+	\subsection{Machine Learning}
+	
+	In this section we introduce neural networks which we will use mainly to reduce the dimension of the data. Our approach belongs to unsupervised learning, a subfield of machine learning. Furthermore, we see that the realizations of neural networks are universal approximators under certain conditions and are thus a particularly suitable tool for our work. We also consider 
+	neural network training and have a closer look at two optimization algorithms.
+	
+	\subsubsection{Neural Networks}\label{subsec NNs}
+		
+	Given a data set, the aim of machine learning could be to find a lower-dimensional representation of the data which preserves the structure of the data as best as possible. In order to achieve this, we are looking for a function that maps the original data into a lower dimensional space. We realize this with a neural network based approach.
+	
+	\newpage
+	\begin{definition}[Neural network]\footnote{This definition is based on Definition 2.8 from \cite{Petersen2022}.}
+		Let $D, d, L\in\N$ and $N_1,\ldots,N_{L-1}\in\N$. A \textsl{neural network} with input dimension $D$, output dimension $d$ and $L$ layers is a sequence of matrix-vector tuples
+		\[\Phi = ((A_1,b_1),(A_2,b_2),\ldots,(A_L,b_L)),\]
+		where for all $l=1,\ldots, L$ the matrices $A_l\in\R^{N_{l}\times N_{l-1}}$ are called \textsl{weight matrices} and the vectors $b_l\in \R^{N_l}$ are called the \textsl{bias vectors} of the neural network $\Phi$. The numbers $N_0:= D$, $N_1,\ldots,N_{L-1}\in\N$ and $N_L:= d$ are the dimensions of the layers. These matrices and vectors contain the \textsl{weights} and \textsl{biases}. They are also called \textsl{parameters} of the network and we notate them by $\theta$. By $\Theta$ we notate the parameter space which contains the parameters $\theta$.\\
+		The \textsl{realization} of a neural network $\Phi$ with \textsl{activation functions} 
+		$\rho_1,\ldots,\rho_{L}:\R\to\R$ is given by the function
+		\[R(\Phi):\R^D\to\R^d,\qquad R(\Phi)(x):=x_L,\]
+		where the output $x_L$ results from
+		\begin{align}
+			\begin{split}
+				x_0&:=x \\
+				x_l &= \rho_l .(A_l x_{l-1} + b_l) \text{ for } l = 1,\ldots, L. \label{Def. realization neural network}
+				%x_L&:= A_L x_{L-1} + b_L. 
+			\end{split}
+		\end{align}
+		Here $\rho_l .$ denotes the component-wise application of the activation function $\rho_l$ to the vectors $A_l x_{l-1} + b_l$.\\
+		We call $N(\Phi):= D + \sum_{j=1}^L N_l$ the \textsl{number of neurons}, $L(\Phi):= L$ the 	\textsl{number of layers} or \textsl{depth} and 
+		\[M(\Phi):= \sum_{l=1}^L M_l:=\sum_{l=1}^L \abs{\abs{A_l}}_0 + \abs{\abs{b_l}}_0\]
+		the \textsl{number of weights}. Here $\abs{\abs{\cdot}}_0$ denotes the number of non-zero entries of a matrix or vector. \\
+		A vector $S=(N_0,\ldots,N_L)\in\N^{L+1}$ is called \textsl{architecture} of a neural network $\Phi$.
+		%\[\Phi = ((A_1,b_1),(A_2,b_2),\ldots,(A_L,b_L))\]
+		%if $A_l\in\R^{N_{l-1}\times N_l}$ for $l=1,\ldots,L$.
+		Given such a vector $S$, we denote by $\mathcal{N}\mathcal{N}(S)$ the set of all neural networks with architecture $S$.\\
+		By a \textsl{multilayer perceptron (MLP)} we refer to the realization of a neural network.
+	\end{definition}	
+	
+	A schematic representation of the 
+	realization of a neural network can be found in figure \ref{Abb. neural network} and 
+	some examples for activation functions can be found in figure \ref{Abb. exp activation functions}.
+	We will see later that the choice of activation function plays an important role in simple MLP's for approximating arbitrary continuous functions.
+		
+	\begin{figure}[!h]
+		\makebox[\textwidth]{
+			\includegraphics[width=0.8\textwidth]{Neuronales_Netz_ohne_Rand_verschiedene_Aktivierungsfunktionen.png}}
+		\caption{Schematic representation of the realization of the neural network 
+			$\Phi = ((A_1, b_1), (A_2, b_2), (A_3, b_3))$ with activation 
+			functions $\rho_1, \rho_2, \rho_3$ and architecture 
+			$S = (6, 8, 6, 4)$.} \label{Abb. neural network}
+	\end{figure} 
+	
+
+	\begin{figure}[!h]
+		\begin{mdframed}[style = inner]
+		\makebox[1.01\textwidth]{
+			\begin{minipage}[m]{0.33\textwidth}
+			\includegraphics[width=\textwidth]{Sigmoid}
+			\end{minipage}
+			\begin{minipage}[m]{0.33\textwidth}
+				\includegraphics[width=\textwidth]{Hyperbolic_tangent}
+			\end{minipage}
+			\begin{minipage}[m]{0.33\textwidth}
+				\includegraphics[width=\textwidth]{ReLU}
+			\end{minipage}
+		}
+		\makebox[1.01\textwidth]{
+			\begin{minipage}[m]{0.27\textwidth}
+				\textsl{Sigmoid}\\[-5ex]
+				\begin{align*}
+					\tilde{S}:\R&\to\R;\\[-0.6ex]
+					x&\mapsto \frac{1}{1 + e^{-x}}\\[0.2ex]
+					\tilde{S}'(x) &= \tilde{S}(x)(1-\tilde{S}(x))					
+				\end{align*}
+				%$S:\R\to\R$; $x\mapsto \frac{1}{1 + e^{-x}}$
+			\end{minipage}
+			\hspace{0.05\textwidth}
+			\begin{minipage}[m]{0.33\textwidth}
+				\textsl{Hyperbolic tangent}\\[-5ex]
+				\begin{align*}
+					\tanh:\R&\to\R;\\[-0.6ex]
+					x&\mapsto \tanh(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}}\\[0.2ex]
+					\tanh'(x) &= 1-\tanh^2(x)
+				\end{align*}
+				%$\tanh:\R\to [0,1]$;\\$x\mapsto \tanh(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}}$
+			\end{minipage}
+			\hspace{0.01\textwidth}
+			\begin{minipage}[m]{0.31\textwidth}
+				\textsl{Rectified \hspace{-0.1cm} linear \hspace{-0.1cm} unit}\hspace{-0.1cm} (ReLU)\\[-5ex]
+				\begin{align*}
+					\mathrm{ReLU}:\R&\to\R;\\[0.9ex]
+					x&\mapsto \max\{x, 0\}\\[1.4ex]
+					\mathrm{ReLU}'(x) &= \mathds{1}_{\R_+}(x)
+				\end{align*}
+				%$\mathrm{ReLU}:\R\to\R$;\\$x\mapsto \max\{x, 0\}$
+			\end{minipage}
+		}	
+		\end{mdframed}
+		\vspace{-3ex}
+		\caption{Examples of commonly used activation functions.}\label{Abb. exp activation functions}	
+	\end{figure}
+	
+	
+	\begin{remark}
+		The set $\mathcal{N}\mathcal{N}(S)$ is a finite-dimensional normed vector space with dimension
+		\begin{align*}
+			\dim(\mathcal{N}\mathcal{N}(S))&=\dim\left(\left(
+			\mathbb{R}^{N_{1}\times N_0}\oplus\mathbb{R}^{N_1}\right)
+			\oplus\ldots\oplus\left(\mathbb{R}^{N_{L}\times N_{L-1}}
+			\oplus\mathbb{R}^{N_L}\right)\right)\\
+			&=\left(\left(
+			\dim\left(\mathbb{R}^{N_{1}\times N_0}\right)+\dim\left(\mathbb{R}^{N_1}\right)
+			\right)
+			+\ldots+\left(\dim\left(\mathbb{R}^{N_{L}\times N_{L-1}}
+			\right)+\dim\left(\mathbb{R}^{N_L}\right)\right)\right)\\
+			&=(N_1\cdot N_0+N_1)+\ldots+(N_{L}\cdot N_{L-1}+N_L)\\
+			&=\sum_{l=1}^L N_{l}\cdot N_{l-1}+N_l
+		\end{align*}
+		and norm 
+		\[\abs{\abs{\Phi}}:=\max_l \abs{\abs{A_l}}_{\infty}+
+		\max_l \abs{\abs{b_l}}_{\infty}.\]
+	\end{remark}
+	\newpage
+	
+	%\vspace*{-0.5\baselineskip}
+	Now, we can define an autoencoder as follows.
+	
+	%\vspace*{-0.2\baselineskip}
+	\begin{definition}[Autoencoder]\label{Def autoencoder}
+		Let $L_1,L_2\in\N$ and $D,d\in\N$ with $d\ll D$. Then an \textsl{autoencoder} $\mathrm{AE}(\Phi_1,\Phi_2)$ is defined by the two neural networks $\Phi_1 = ((A_1^1, b_1^1),\ldots,(A_{L_1}^1, b_{L_1}^1))$ with input dimension $D$ and output dimension 
+		$d$ and 
+		$\Phi_2 = ((A_1^2, b_1^2),\ldots,(A_{L_2}^2, b_{L_2}^2))$ with input dimension $d$ 
+		and output dimension $D$. 
+		The neural network $\Phi_1$ is also called \textsl{encoder} network and the 
+		neural network $\Phi_2$ is also called \textsl{decoder} network. 
+		The realization $R(\mathrm{AE}(\Phi_1, \Phi_2)) : \R^D\to \R^D$ of an
+		autoencoder is defined by
+		\[R(\mathrm{AE}(\Phi_1, \Phi_2))(x) := (R(\Phi_2)\circ R(\Phi_1))(x)\]
+		for every $x\in\R^D$. The realization of the encoder network is then called \textsl{encoding} and the realization of the decoder network is called \textsl{decoding}. The space in which the encoded data resides is called \textsl{encoded data space} or \textsl{latent space}.
+	\end{definition}
+	
+	%\vspace*{-0.5\baselineskip}
+	\newpage
+	\subsubsection{Universal Approximation Theorem}
+	
+	One of the most famous results in neural network theory is that under minor conditions to the activation function on a compactum, arbitrary continuous functions can be approximated by a MLP 
+	with two layers. This result was first shown by Hornik \cite{Hornik1989} and Cybenko \cite{Cybenko1989}. Neural networks thus realize approximately arbitrary functions that map the original data to their lower-dimensional representation. This subsection is based on chapter 2.1 in \cite{Petersen2022}. \\
+	To obtain a suitable approximation term we need to define a topology on the space of functions of interest. Let $K\subset \R^D$ be a compact set and 
+	\[C(K) = \{f:K\to \R \ \vert\  f\text{ is continuous}\}\]
+	the set of continuous functions on $K$ which we equip with the uniform norm
+	\[\abs{\abs{f}}_\infty = \sup_{x\in K} \abs{f(x)}.\]
+	If $K$ is a compact space, we know from Riesz's theorem that the topological dual space of $C(K)$ is the space
+	\[\mathscr{M} = \{\mu\ \vert\  \mu\text{ is a signed Borel measure on }K\}.\]
+	Now, we can define the concept of universality.
+	\begin{definition}[Universality]
+		Let $D,L\in\N$, $\rho :\R\to\R$ be a continuous activation function and $K$ be a 
+		compact set. Denote by $\mathrm{MLP}(\rho, D, d, L)$ the set of all MLP's with 
+		$D$-dimensional input, $L$ layers, output dimension $d$ and activation functions $\rho$ with
+		last activation function as the identity, i.e. 
+		the set of realizations of neural networks with architecture 
+		$S = (D, N_1, \ldots, N_{L-1}, d)$ for $N_1,\ldots, N_{L-1}\in\N$ and 
+		activation functions $\rho_1,\ldots,\rho_{L-1}, Id$ with $\rho =\rho_1=\ldots=\rho_{L-1}$. \\
+		We call the set of MLPs with one-dimensional output $\mathrm{MLP}(\rho, D, 1, L)$ universal if $\mathrm{MLP}(\rho, D, 1, L)$ is 
+		dense in $C(K)$.
+	\end{definition}
+	
+	\begin{definition}[Discriminatory]
+		Let $D\in\N$ and $K\subset\R^D$ be a compact set. A continuous function 
+		$f:\R\to\R$ is called \textsl{discriminatory} if for all $\mu\in\mathscr{M}$ 
+		such that
+		\[\int_K f(Ax -b)\mathrm{d}\mu(x) = 0 \qquad \text{for all $A\in\R^{1\times D}$ and $b\in\R$}\]
+		holds follows $\mu \equiv 0$.
+	\end{definition}
+	
+	The classical universal approximation theorem is now given by:
+	
+	\begin{theorem}[Universal approximation theorem]
+		Let $D\in\N$, $K\subset\R^D$ be a compact set and $\rho:\R\to\R$ be a 
+		discriminatory activation function. Then $\mathrm{MLP}(\rho, D, 1, 2)$ is universal.
+	\end{theorem}
+	
+	\begin{proof}
+		The proof can be found in theorem 2.4 \cite{Petersen2022}.
+	\end{proof}
+
+	It was proven by Leshno \cite{Leshno1992} that this theorem can be extended further.
+	
+	\begin{theorem}[Extension of the universal approximation theorem]
+		Let $D\in\N$, $K\subset\R^D$ be a compact set and $\rho:\R\to\R$ be a continuous 
+		acitvation function. Then the set of multilayer perceptrons $\mathrm{MLP}(\rho, D, 1, 2)$ with bias $b_2 = 0$ is universal if and only if the activation function $\rho$ 
+		is not polynomial.
+	\end{theorem}
+	
+	\begin{proof}
+		The proof can be found in \cite{Leshno1992}.
+	\end{proof}
+
+	Moreover, we note that this theorem can be extended to both MLPs with arbitrary depth 
+	$L\geq 2$ and arbitrary output dimension $d\in\N$. \\
+	The universal approximation theorem states that every arbitrary continuous function can be approximated by a sequence of neural networks. But it makes no statement about the choice of the networks with which we can approximate the function that maps the input data into the output data. For this reason, we consider in the following section how to find the parameters of the neural network in such a way that we receive a suitable approximation. This process is called \textsl{training}.
+
+	\subsubsection{Training of Neural Networks}\label{subsec training NNs}
+	
+	In this section we restrict our attention to neural network training. \\
+	Let a data set $\mathcal{X} = \{x_i\}_{i=1,\ldots,N}\subset\R^{D\times N}$ be given. We now want to approximate a function that maps this data set into a lower-dimensional representation while respecting a task. In the supervised setting for example such a task could be the classification of labeled data. In 
+	the unsupervised setting with an autoencoder such a task could be to encode the data into the latent space and then decode the encoded data such that the realization of the autoencoder is as close as possible to the original data.
+	We then want to approximate this function with a neural network by adjusting the parameters of the network with an iterative algorithm. We define an objective function which we want to minimize with this algorithm.
+	\begin{definition}[Loss function]
+		Let $\Phi$ be a neural network with output dimension $d\in\N$ and parameters $\theta$. We define the output data set $\hat{\mathcal{X}} = \{\hat{x}_i\}_{i=1,\ldots,N}\subset \R^d$ 
+		by $\hat{x}_i := R(\Phi)(x_i)$ for all $i=1,\ldots,N$. Then, we want to assign a loss to a given realization of the neural network $R(\Phi)(x)$. A \textsl{loss function} is a function
+		\[L:\Theta\times\R^d\to[0,\infty),\]
+		such that for all $\theta\in\Theta$ the function $L(\theta,\cdot):\R^d \to [0,\infty)$ 
+		is Borel-measurable.
+	\end{definition}
+	Given parameters $\theta$ and realization $\hat{x}_i$ we can now 
+	compute the loss $L(\theta, \hat{x}_i)$.
+	\begin{definition}[Objective loss function]
+		We define the \textsl{objective loss function} which calculates 
+		the empirical risk of the realization with parameters $\theta$ by
+		\begin{align*}
+			\mathcal{L}:\Theta&\to [0,\infty) \\
+			\theta&\mapsto \mathcal{L}(\theta) := \E[L(\theta, x)] \approx \frac{1}{N} \sum_{i=1}^N L(\theta, \hat{x}_i).
+		\end{align*}
+	\end{definition}
+	Note that the expected value is calculated using the probability measure $P_\theta$ 
+	with respect to the parameter $\theta$ on the data space. The goal is now to solve the nonlinear and 
+	typically nonconvex optimization problem
+	\[\argmin_{\theta\in\Theta} \mathcal{L}(\theta).\]
+	If the objective loss function is differentiable, we can minimize it by calculating the gradients
+	\[\nabla_\theta \mathcal{L}(\theta) = \frac{1}{N} \sum_{i=1}^N \nabla_\theta L(\theta, \hat{x}_i) = \frac{1}{N} \sum_{i=1}^N \nabla_\theta L(\theta, R(\Phi)(x_i)).\]
+	We require that the loss function which depends on the realization of the neural network is differentiable. The gradients of a data point $x = x_i$ can then be calculated applying the chain rule \footnote{The notation of $x_l = \rho_l.(A_l x_{l-1} + b_l)$ for $l=1,\ldots, L-1$ here is notation from equation \ref{Def. realization neural network} for a corresponding neural network.}
+	\[ \nabla_\theta L(\theta, R(\Phi)(x)) = \nabla_\theta x_{L-1} \nabla_{x_{L-1}} L(\theta,x_L) = \nabla_\theta x_{L-2} \nabla_{x_{L-2}} x_{L-1} \nabla_{x_{L-1}}L(\theta, x_L) = \cdots .\]%\frac{\partial L(\theta, x_L)}{\partial x_{L-1}} \frac{\partial x_{L-1}}{\partial \theta} = \frac{\partial L(\theta, \rho_L.(A_L x_{L-1} +b_L))}{\partial x_{L-1}} \frac{\partial x_{L-1}}{\partial \theta} = \cdots .\]
+	Thus, we can calculate the gradient of the loss with respect to all parameters of the network, i.e. the weights and biases, by differentiating iteratively backwards. This method is called \textsl{backpropagation} and was developed by Rumelhart et. al \cite{Rumelhart1986}.
+	Here we must additionally require that the activation functions of the neural network are at least piecewise differentiable. \\
+	We now want to optimize the parameters and thereby train our model by calculating the gradients using backpropagation. 
+	In particular, we want to focus on two optimization algorithms. First, we introduce the \textsl{gradient descent} algorithm  as an optimization algorithm which is represented by algorithm \ref{Gradient Descent}. The idea of this algorithm is to take steps in the direction of the negative gradient in the parameter space. The negative gradient defines a descent direction of the objective loss function. Therefore, we minimize the objective loss function. The stepwidth depends on the learning rate of the algorithm.
+	
+	\RestyleAlgo{ruled}
+	\begin{algorithm}
+		\caption{Gradient descent} \label{Gradient Descent}
+		\textbf{Require:} dataset $\mathcal{X}$, learning rate $\eta\in (0,1]$, $\theta_0$, epochs\\
+		$k\gets 0$\\
+		\While{$k< \mathrm{epochs}$}{
+		%	$g \gets \nabla_\theta J(\theta)$\\
+			$\nabla \gets \mathrm{backprop}(\theta_k, \mathcal{L}, \mathcal{X})$\\
+			$\theta_{k+1}\gets \theta_{k} - \eta \nabla$\\
+			$k\gets k+1$
+		}
+	\end{algorithm}
+	
+	
+	Curry \cite{Curry1944} proved that this algorithm for nonlinear optimization problems converges to a local minimum. For convex objective loss functions, a local minimum also corresponds to a global minimum. Due to the highly nonconvex structure of the realization of the neural network the algorithm does not necessarily converge to a global minimum. \\
+	The second algorithm we want to introduce is the \textsl{stochastic gradient descent} algorithm from page 72 \cite{Kingma2019VAE} which is represented by algorithm \ref{Stochastic Gradient Descent}. This algorithm uses 
+	randomly sampled subsets $\mathcal{D}_1,\ldots,\mathcal{D}_{n_{\mathrm{batches}}}$ of the 
+	dataset $\mathcal{X}$, so called \textsl{mini batches}. On each mini batch we update 
+	the parameters using gradient descent.
+	The stochasticity introduced by this algorithm mitigates the consequences of the convexity problem mentioned above. Compared to the gradient descent algorithm the convergence to better local minima is possible and faster convergence of the algorithm per epoch is given. \\
+	Another optimizer we will use later for our methods is Kingma's Adam optimizer \cite{Kingma2014Adam}. This is fundamentally based on the momentum method.\\
+	\begin{algorithm}[H]
+		\caption{Stochastic gradient descent} \label{Stochastic Gradient Descent}
+		\textbf{Require:} dataset $\mathcal{X}$, learning rate $\eta\in (0,1]$, $\theta_0$, epochs, $n_{\mathrm{batches}}$\\
+		$k,e\gets 0$\\
+		\While{$e< \mathrm{epochs}$}{
+			sample mini batches $\mathcal{D}_1,\ldots,\mathcal{D}_{n_{\mathrm{batches}}}\subset \mathcal{X}$\\
+			\For{$n_{\mathrm{batch}} \mathrm{~in~} 1:n_{\mathrm{batches}}$}{
+			%$g \gets \nabla_\theta J(\theta)$\\
+			$\nabla \gets \mathrm{backprop}(\theta_k, \mathcal{L}, \mathcal{D}_{n_{\mathrm{batch}}})$\\
+			$\theta_{k+1}\gets \theta_{k} - \eta \nabla$\\
+			$k \gets k+1$
+			}
+		$e\gets e+1$
+		}
+	\end{algorithm}
+	
+	
+	
+	\clearpage
+	
+	\subsection{Stochastic Differential Equations}
+	
+	In this chapter we introduce stochastic differential equations. To be able to introduce them, we first have to deal with stochastic processes in order to be able to define the stochastic integral.
+	
+	\subsubsection{Stochastic Processes and the Stochastic Integral}
+	
+	This section is based on \cite{StoProSchmidt2021}. In the following sections let $(\Omega, \mathcal{F}, P)$ be a probability space and $(E, d)$ a complete, separable metric space with 
+	Borel-$\sigma$-algebra $\mathcal{B}(E)$. The objective of this section is to construct the stochastic integral 
+	\[H\cdot X = \left(\int_0^t H_s \mathrm{d}X_s\right)_{t\in\R_{\geq 0}}\]
+	for a semimartingale $X$ and an appropriate process $H$. With this knowledge we can then define stochastic differential equations of the form
+	\begin{align*}
+		\mathrm{d}X_t &= b(t, X_t)\mathrm{d}t + \boldsymbol{\sigma}(t, X_t)\mathrm{d}W_t \\
+		X_0 &= \xi.
+	\end{align*}
+	We will later define the Ornstein-Uhlenbeck process as the solution of a specific stochastic 
+	differential equation. This process is important for our methods. We start by defining a stochastic process.
+	
+	\begin{definition}[Stochastic process]
+		A \textsl{stochastic process} is a family $X = (X_t)_{t\in\R_{\geq 0}}$ such that $X_t:\Omega\to E$ is a random variable, i.e. $X_t$ is $\mathcal{F}/\mathcal{B}(E)$-measurable, for all $t\in\R_{\geq 0}$. For a fixed
+		$\omega\in\Omega$ we call the map $t\mapsto X_t(\omega)$ a \textsl{path} of $X$. 
+		We call a stochastic process continuous if all paths are continuous.
+	\end{definition}
+
+	\begin{definition}[Filtration]
+		An increasing sequence $\mathbb{F}=(\mathcal{F}_t)_{t\in\R_{\geq 0}}$ of sub-$\sigma$-algebras 
+		of $\mathcal{F}$, that is
+		\[\mathcal{F}_s\subset\mathcal{F}_t\subset\mathcal{F}\text{ for all } 0\leq s\leq t,\]
+		is called a \textsl{filtration}. 
+		Further, we call a filtration \textsl{right-continuous} if $\mathcal{F}_t = \bigcap_{u\geq t}\mathcal{F}_u$ holds for all $t\geq 0$. \\
+		We call a stochastic process $X$ $\mathbb{F}$-\textsl{adapted} if $X_t$ is $\mathcal{F}_t$-measurable for all $t\geq 0$. For simplicity we write adapted instead of $\mathbb{F}$-adapted.
+	\end{definition}
+	
+	\begin{definition}[Stochastic basis]
+		Let $(\Omega, \mathcal{F}, P)$ be a probability space and let $\mathbb{F}$ be a right-continuous filtration 
+		$\mathbb{F}$. Then we call $(\Omega, \mathcal{F}, P, \mathbb{F})$ a \textsl{filtered probability space} or \textsl{stochastic basis}.\\
+		A stochastic basis satisfies the \textsl{usual conditions} if it is complete, i.e. 
+		if every subset of a $P$-null set is measurable and $\mathcal{F}_0$ contains all $P$-null sets.
+	\end{definition}
+	
+	In the following we work on a given stochastic basis. For the next two definitions we refer to Definition 16.1 and 16.19 \cite{Pfaffelhuber2020}.
+	
+	\begin{definition}[Markov process]
+		Let $(\Omega, \mathcal{F}, P)$ be a probability space with filtration $\mathbb{F}$. An adapted stochastic process $X$ is called \textsl{Markov process} if 
+		$\mathcal{F}_s$ and $X_t$ are independent given $X_s$ for $s\leq t$ that means if for all $A\in\mathcal{B}(E)$ 
+		\[P(X_t\in A \vert \mathcal{F}_s)=P(X_t\in A\vert X_s)\]
+		holds.
+	\end{definition}
+	
+	\begin{definition}[Time-homogeneous Markov process]\label{Def time homog}
+		A Markov process $X$ is called \textsl{time-homogeneous} if for all $A\in\mathcal{B}(E)$ 
+		and $s \leq t$
+		\[P(X_t\in A \vert \mathcal{F}_s)=P(X_t\in A\vert X_s)\]
+		only depends on $t-s$, i.e. if we have
+		\[P(X_t \in A\vert X_s) = P(X_{t-s}\in A\vert X_0)\]
+		for all $A\in\mathcal{B}(E)$.
+	\end{definition}
+	
+	We now define a Brownian motion which is an important example for a stochastic process. 
+	
+	\begin{definition}[Brownian motion]\label{Def brownian motion}
+		A \textsl{Brownian motion} $W$ is an adapted, continuous stochastic process such that
+		\begin{itemize}
+			\item[(i)] $W_0 = 0,$
+			\item[(ii)] $\E[W_t]=0$ and $\V[W_t]<\infty$ for all $t\in\R_{\geq 0}$,
+			%\item[(iii)] $W$ has \textsl{independent increments}, that is for all $0\leq s_1\leq t_1\leq s_2\leq t_2$ the random variables $W_{t_1} - W_{s_1}$ 
+			%and $W_{t_2}-W_{s_2}$ are independent, and 
+			\item[(iii)] $W_t - W_s$ is independent of $\mathcal{F}_s$ for all $0\leq s\leq t$ and
+			\item[(iv)] $W$ has \textsl{normal increments}, that is $W_t-W_s\sim\mathcal{N}(0, t-s)$ for all $0\leq s\leq t$.
+		\end{itemize}
+	\end{definition}
+
+	Some paths of a Brownian motion are represented in figure \ref{Abb Pfade Brownsche Bewegung}.
+	
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width=0.8\textwidth]{Paths_BM_new}
+		\caption{Representation of eight paths of a Brownian motion.}
+		\label{Abb Pfade Brownsche Bewegung}
+	\end{figure}
+	
+	\begin{definition}[Martingale]
+		A \textsl{(sub-/super-) martingale} $M$ is an adapted, continuous stochastic process such that
+		\begin{itemize}
+			\item[(i)] $\E[M_t]<\infty$ for all $t\geq 0$ and
+			\item[(ii)] $\E[M_t\vert\mathcal{F}_s] = M_s$ for all $0\leq s\leq t$.
+		\end{itemize}
+		For submartingales the second condition is replaced by $\E[M_t\vert \mathcal{F}_s]\geq M_s$ and for supermartingales by $\E[M_t\vert \mathcal{F}_s]\leq M_s$.
+	\end{definition}
+	
+	We note that a Brownian motion $W$ is a martingale because
+	\[\E[W_t\vert\mathcal{F}_s] = \E[W_t - W_s +W_s \vert\mathcal{F}_s] = \E[W_t - W_s\vert\mathcal{F}_s] + \E[W_s\vert\mathcal{F}_s]= \E[W_t - W_s] + W_s = W_s\]
+	holds for all $0\leq s\leq t$.
+	
+	\clearpage
+	\begin{definition}[Locally bounded variation]
+		We call a stochastic process $X$ \textsl{of locally bounded variation} if
+		\[\text{Var}(X)_t := \sup_{0\leq t_0\leq\ldots\leq t_n\leq t} \sum_{i=1}^n \abs{X_{t_i}(\omega)- X_{t_{i-1}}(\omega)}<\infty\]
+		holds for all $t\geq 0$ and $\omega\in\Omega$.
+	\end{definition}
+	
+	The Brownian motion is not of locally bounded variation. For the prove of this we refer to Theorem 29 of \cite{Protter2004}. Now, we can define the class of processes with respect to which we can integrate.
+	
+	\begin{definition}[Semimartingale]
+		A stochastic process $X$ is called a \textsl{semimartingale} if it has a decomposition
+		\[X = X_0 + M + A,\]
+		where $M$ is a local martingale such that $M_0 = 0$ and $A$ is a stochastic process of locally bounded variation.
+	\end{definition}
+	
+	In this definition it is required that $M$ is a local martingale, a concept we have not introduced 
+	yet. A stochastic process satisfies a property "locally" if there exists a localizing sequence, i.e. a sequence of stopping times which increases to infinity such that the process stopped at any of these stopping times satisfies the desired property. See also Definition 4.1 \cite{StoProSchmidt2021} or Definition 1.6.2 \cite{StoProTappe2018}. For the concept of a stopping time we refer to Definition 2.1 \cite{StoProSchmidt2021}. We will not discuss local martingales further in this thesis. Important for us to know is that every martingale is a local martingale.\\
+	We note that the decomposition of continuous semimartingales is unique. 
+	Let $X$ be a continuous semimartingale with decompositions $X=X_0 + M + A = X_0 + N + B$ for local martingales 
+	$M$ and $N$ with $M_0=0=N_0$ and processes $A$ and $B$ with locally bounded variation. Then the process $M-N = B-A$ is a continuous local martingale with locally bounded variation. Further Theorem 
+	5.21 \cite{StoProSchmidt2021} implies that $M-N = 0 = B-A$. Thus the uniqueness is shown.
+	In particular, the Brownian motion has a unique semimartingale decomposition since it is 
+	a continuous martingale.\\
+	We can now define the stochastic integral with simple integrands and then expand it. 
+	\clearpage
+	\begin{definition}[Stochastic integral with simple integrands]
+		We call a stochastic process $H$ \textsl{simple} if it has the form 
+		\[H = Y \mathds{1}_{[0]} \qquad \text{or}\qquad H = Y\mathds{1}_{(u,v]}\]
+		for a bounded and $\mathcal{F}_u$-measurable random variable $Y$ and $0\leq u\leq v$. \\
+		Let $X$ be a semimartingale. Then we can define the stochastic integral with respect 
+		to a simple stochastic process $H$ as the stochastic process $H\cdot X$ given by
+		\[ (H\cdot X)_t := \int_0^t H_s \mathrm{d}X_s := \begin{cases}
+			0 & H=Y \mathds{1}_{[0]} \\
+			Y\left(X_{\min\{v,t\}} - X_{\min\{t, u\}}\right) & H = Y\mathds{1}_{(u,v]}
+		\end{cases}.\]
+	\end{definition}
+
+	The idea is to continuously extend the integral to suitable large spaces by taking limits of simple integrands.
+	
+	\begin{theorem}[Stochastic integral]
+		Let $X$ be a semimartingale. The map $H\mapsto H\cdot X$ defined on the 
+		space of continuous, simple integrands has an extension to the space of locally bounded, continuous integrands such that 
+		\begin{itemize}
+			\item[(i)] the stochastic process $H\cdot X$ is adapted and continuous and
+			\item[(ii)] the map $H\mapsto H\cdot X$ is linear
+		\end{itemize}
+	\end{theorem}
+	
+	%\footnotetext{Here "local" means that a localizing sequence, i.e. a sequence of stopping times which increases to infinity, exists, such that the process stopped at any of these stopping times satisfies the desired property. See also Definition 4.1 \cite{StoProSchmidt2021} or Definition 1.6.2 \cite{StoProTappe2018}.}
+	
+	\begin{proof}
+		For the proof, see \cite{Jacod2003} theorem 4.31.
+	\end{proof}
+
+	\begin{definition}[Quadratic covariation]\label{Def quadr covariation}
+		Let $X$ and $Y$ be two continuous semimartingales. The \textsl{quadratic covariation} of $X$ and $Y$ is the stochastic process $[X,Y]$ defined by
+		\[[X,Y]_t:= X_0Y_0 +XY - (X\cdot Y)_t - (Y\cdot X)_t.\]
+	\end{definition}
+
+	\begin{lemma}\label{lemma covariation}
+		Let $X$ and $Y$ be two continuous semimartingales. For $t >0$ a partition $\xi_n =\{\tau_{n,k_1},\ldots,\tau_{n,k_n}\}$ of $[0,t]$ is given such that $\max_k \abs{\tau_{n,k}-\tau_{n,k-1}} \xrightarrow{n\to\infty}0$. Then 
+		\[Z_n := \sum_{k=1}^{k_n} (X_{t_{n,k}}-X_{t_{n,k-1}})(Y_{t_{n,k}}-Y_{t_{n,k-1}})\xrightarrow{n\to\infty}_p [X,Y]_t\]
+		holds where $\to_p$ denotes the convergence in probability.
+	\end{lemma}
+	
+	\begin{proof}
+		For the statement and the proof we refer to Lemma 19.50 \cite{Pfaffelhuber2020}.
+	\end{proof}
+
+	The following theorem is one of the most important results of stochastic analysis.
+	
+	\begin{theorem}[Itô's lemma for continuous semimartingales] \label{Itos lemma}
+		Let $X=(X^1,\ldots, X^d)$ be a $d$-dimensional continuous semimartingale 
+		with component-wise semimartingale decomposition $X^i = X_0^i + M^i + A^i$ and let $f$ be a function in $C^2(\R^d, \R)$. The  stochastic process $f(X)$ is then a semimartingale such that for all $t\geq 0$
+		\begin{align*}
+			f(X)_t = f(X_0) + \sum_{i=1}^d \int_0^t\partial_i f(X)_s \mathrm{d}X^i_s + 
+			\frac{1}{2} \sum_{i,j=1}^d \int_0^t\partial_{ij} f(X)_s \mathrm{d}[M^i, M^j]_s.
+		\end{align*}
+		
+	\end{theorem}
+
+	\begin{proof}
+		We refer to the proof of Theorem 4.57 in \cite{Jacod2003}.
+	\end{proof}
+
+	\subsubsection{Stochastic Differential Equations}
+	
+	In this section we define stochastic differential equations and their solutions. We also mention 
+	under what conditions unique solutions exist. In order to determine a numerical solution 
+	of a stochastic differential equation we introduce the Euler-Maruyama method. This section is based on Section 5.2 of \cite{Karatzas2012}.
+	
+	\begin{definition}[Stochastic differential equation]\label{Def SDE}
+		Let $b:\R_{\geq 0} \times \R^d \to \R^d$ and $\boldsymbol{\sigma}:\R_{\geq 0} \times \R^d\to\R^{d\times r}$ 
+		be Borel-measurable functions and let $W$ be an $r$-dimensional Brownian motion. We call $b$ the drift vector and $\boldsymbol{\sigma}$ the 
+		dispersion matrix. An equation of the form
+		\begin{align}
+			\mathrm{d}X_t &= b(t, X_t)\mathrm{d}t + \boldsymbol{\sigma}(t, X_t)\mathrm{d}W_t \label{SDE}
+		\end{align}
+		is called \textsl{stochastic differential equation}. A stochastic differential equation can also be written component-wise as
+		\begin{align*}
+			\mathrm{d}X^i_t &= b^i(t, X_t)\mathrm{d}t + \sum_{j=1}^r \boldsymbol{\sigma}_{ij}(t, X_t)\mathrm{d}W^j_t
+		\end{align*}
+		for $1\leq i \leq d$. In this context $X$ is a continuous $d$-dimensional stochastic process. %$X$ a solution of \ref{SDE} if it satisfies the conditions  holds is called a \textsl{solution}. 
+		The drift vector $b$ and the dispersion matrix $\boldsymbol{\sigma}$ are 
+		the coefficients of this equation and we call the matrix $\boldsymbol{\sigma}\boldsymbol{\sigma}^{\mathrm{T}}$ the \textsl{diffusion matrix}.\\
+		If there is also a $d$-dimensional random variable $\xi$ given such that in 
+		addition to the stochastic differential equation \ref{SDE} also $X_0 = \xi$ needs 
+		to be held we call this problem a \textsl{stochastic initial value problem}. Further, we call $\xi$ 
+		the \textsl{initial value}.
+	\end{definition}
+	
+	We distinguish strong and weak solutions and first want to define strong solutions of stochastic differential equations. \\
+	In order to define strong solutions we fix a probability space $(\Omega, \mathcal{F}, P)$ on which an $r$-dimensional Brownian motion exists. Furthermore, we assume that a $d$-dimensional 
+	random variable $\xi$ exists which is independent of $W$. 
+	We consider
+	\[\mathcal{G}_t = \sigma(\xi, W_s; 0\leq s\leq t) \text{ with } \mathcal{G}_\infty = \sigma\left(\bigcup_{t\geq 0}\mathcal{G}_t\right)\]
+	for all $t\geq 0$ as well as the collection of null sets
+	\[N_0 = \{ N \subset \Omega\ \vert\ \exists G\in \mathcal{G}_\infty \text{ with } N\subset G\text{ and } P(G)=0\}.\]
+	Now, we can create the filtration $\mathbb{F} = (\mathcal{F}_t)_{t\in\R_{\geq 0}}$ by
+	\[\mathcal{F}_t = \sigma(\mathcal{G}_t \cup N_0)\]
+	for all $t\geq 0$ and
+	\[\mathcal{F}_\infty = \sigma\left(\bigcup_{t\geq 0}\mathcal{F}_t\right).\]
+	Following the proof of Theorem 2.7.7 of \cite{Karatzas2012} we observe that the filtration $\mathbb{F}$ 
+	satisfies the usual conditions. \\
+	For the following definition see also Definition 2.1 \cite{Karatzas2012}.
+	
+	\begin{definition}[Strong solution] \label{SDE strong solution}
+		A continuous stochastic process $X$ on the probability space $(\Omega, \mathcal{F},\mathbb{F})$ 
+		with respect to the Brownian motion $W$ and initial condition $\xi$ is called a \textsl{strong solution}
+		of the stochastic differential equation \ref{SDE} if it satisfies the following properties:
+		\begin{itemize}
+			\item[(i)] $X$ is adapted to the above defined filtration $\mathbb{F}$,
+			\item[(ii)] $P(X_0 = \xi)=1$, 
+			\item[(iii)] for all $t\geq 0$ we have
+			\begin{align*}
+				P\left(\int_0^t \abs{b_i(s, X_s)} +\boldsymbol{\sigma}_{ij}^2(s, X_s) \mathrm{d}s<\infty\right)=1
+			\end{align*}
+			\item[(iv)] and for all $t\geq 0$ we have
+			\begin{align*}
+				X_t &= X_0 + \int_0^t b(s, X_s)\mathrm{d}s + \int_0^t \boldsymbol{\sigma}(s,X_s)\mathrm{d}W_s.
+			\end{align*}
+		\end{itemize}
+	\end{definition} 
+
+	\begin{definition}[Weak solution]
+		A \textsl{weak solution} of the stochastic differential equation \ref{SDE} is a tuple 
+		$((X,W),(\Omega, \mathcal{F}, P,\mathbb{F}))$ where
+		\begin{itemize}
+			\item[(i)] $(\Omega, \mathcal{F}, P,\mathbb{F})$ is a stochastic basis,
+			\item[(ii)] $X$ is an adapted continuous stochastic process and 
+			\item[(iii)] $W$ is an $r$-dimensional Brownian motion
+		\end{itemize}
+		such that the properties (iii) and (iv) from definition 
+		\ref{SDE strong solution} are satisfied.
+	\end{definition}
+	
+	Therefore, the difference between weak and strong solutions becomes clear.
+	For strong solutions of the stochastic differential equation the Brownian motion is given. 
+	In contrast, for weak solutions we do not only look for a stochastic process that solves 
+	the stochastic differential equation but also for a Brownian motion. 
+	Thus, it is clear that every strong solution is also a weak solution. 
+	
+	\begin{theorem}[Existence and uniqueness of strong solutions]\label{Strong sol ex un}
+		Suppose that the random variable $\xi$ is square integrable, i.e $\E[\abs{\abs{\xi}}^2]< \infty$. Further assume that the coefficients $b$ and $\boldsymbol{\sigma}$ are globally Lipschitz continuous with Lipschitz constants $K_b>0$ and $K_{\boldsymbol{\sigma}}>0$ 
+		and satisfy the \textsl{linear growth conidition}, i.e. that 
+		for $K=K_b + K_{\boldsymbol{\sigma}}>0$ and for all $t\geq 0$ and $x\in\R^d$ we have
+		\begin{align}
+			\abs{\abs{b(t, x)}}^2 + \abs{\abs{\boldsymbol{\sigma}(t,x)}}^2 \leq K^2 (1+\abs{\abs{x}}^2).\label{SDE Zusatzannahme}
+		\end{align}
+		Then, there exists a unique\footnote{By uniqueness we mean uniqueness up to indistinguishability as defined in Definition 1.4 \cite{StoProSchmidt2021}} strong solution of the stochastic differential equation \ref{SDE}.
+	\end{theorem}
+
+	\begin{proof}
+		For the statements and proofs see Theorem 2.5 and Theorem 2.9 
+		\cite{Karatzas2012}.
+	\end{proof}
+	
+	We will see that the stochastic differential equations considered in this thesis will
+	satisfy the conditions of Theorem \ref{Strong sol ex un}. 
+	\newpage
+	We now want to introduce the Euler-Maruyama method based on the method in section 6.1.1 of \cite{Glasserman2004}. This method builds on the explicit Euler method for determining an approximate solution of an ordinary initial value problem, see also Algorithm 21.1 \cite{Bartels2016}. The Euler-Maruyama method is a numerical method for approximating the solution of a stochastic initial value problem.
+	
+	\begin{definition}[Euler-Maruyama method]\label{Def Euler-Maruyama method} \label{Def Eul Mar method}
+		Let $W$ be an $r$-dimensional Brownian motion and a stochastic initial value problem
+		\begin{align*}
+			\mathrm{d}X_t &= b(t, X_t)\mathrm{d}t + \boldsymbol{\sigma}(t, X_t)\mathrm{d}W_t \\
+			X_0 &= x_0
+		\end{align*}
+		for a given vector $x_0\in\R^d$. To determine the numerical approximation of the solution on an interval 
+		$[0,T]$ with $T>0$ we choose discrete and deterministic time points 
+		\[0= \tau_0< \tau_1<\ldots< \tau_n =T\]
+		for $n\in\N$. We define the individual step width $h_k$ of the time points by 
+		$h_k = \tau_{k+1}-\tau_k$ for $k=0,\ldots,n-1$. The stochastic differential $\mathrm{d}W_t$ 
+		is now replaced by the increments
+		\[\Delta W_k := W_{\tau_{k+1}}-W_{\tau_k}\]
+		for $k=0,\ldots,n-1$. From property (iv) of the definition of the Brownian motion \ref{Def brownian motion} we know that
+		\[\Delta W_k \sim \mathcal{N}(0, h_k)\]
+		holds for $k=0,\ldots, n-1$. The \textsl{Euler-Maruyama method} calculates an approximation $\hat{X}$ of $X$ by
+		\begin{align*}
+			\hat{X}_{k+1} &= \hat{X}_k + b(\tau_k, \hat{X}_k)\cdot h_k + \boldsymbol{\sigma}(\tau_k, \hat{X}_k)\cdot \Delta W_k\\
+			\hat{X}_0 &= x_0
+		\end{align*}
+		for $k=0,\ldots,n-1$. Then $\hat{X}_k$ is an approximation of $X_{\tau_k}$.
+		
+	\end{definition}
+	
+	%\begin{definition}
+	%	Let $(\Omega, \mathcal{F}, P)$ be a probability space and a $r\in\N$ dimensional Brownian motion $W$.  that satisfies the usual conditions and a $r\in\N$ dimensional 
+	%	Brownian motion $W$. Let further be a $d\in\N$ dimensional random variable $\xi$, such 
+	%	that $\E[\abs{\abs{\xi}}^2]< \infty$ and globally Lipschitz continuous functions $b:\R_{\geq 0} \times \R^d \to \R^d$ and $\boldsymbol{\sigma}:\R_{\geq 0} \times \R^d\to\R^{d\times r}$ satisfying the \textsl{linear growth condition}, i.e. that 
+	%	for the summed up Lipschitz constant $K>0$ and for all $t\geq 0$ and $x\in\R^d$ holds
+	%	\begin{align}
+	%		\abs{\abs{b(t, x)}}^2 + \abs{\abs{\sigma(t,x)}}^2 \leq K^2 (1+\abs{\abs{x}}^2).%\label{SDE Zusatzannahme}
+	%	\end{align}
+	%	The function 
+	%	$b$ is called \textsl{drift vector} and the function $\sigma$ is called \textsl{diffusion %matrix}. A stochastic process $X$ is a \textsl{solution} of the \textsl{stochastic differential equation} (also called \textsl{stochastic initial value problem})
+	%	\begin{align*}
+	%		\mathrm{d}X_t &= b(t, X_t)\mathrm{d}t + \boldsymbol{\sigma}(t, X_t)\mathrm{d}W_t \\
+	%		X_0 &= \xi,
+	%	\end{align*}
+	%	if $P(X_0 = \xi) = 1$, for all $t\geq 0$ holds
+	%	\begin{align*}
+	%		X_t &= \int_0^t b(s, X_s)\mathrm{d}s + \int_0^t \boldsymbol{\sigma}(s,X_s)\mathrm{d}W_s \\
+	%		X_0 &= \xi
+	%	\end{align*}
+	%	and for all $t\geq 0$, $1\leq i\leq d$ and $1\leq j \leq r$ holds
+	%	\begin{align*}
+	%		P\left(\int_0^t \abs{b_i(s, X_s)} +\boldsymbol{\sigma}_{ij}^2(s, X_s) \mathrm{d}s<\infty\right)=1.
+	%	\end{align*}
+	%	%The functions $b$ and $\sigma$ are also called \textsl{drift and diffusion coefficient}.
+	%\end{definition}
+	%This definition is based on definition 5.1 of \cite{Karatzas2012}. Compared 
+	%to this definition our definition has the additional requirements of finite second moment of 
+	%$\xi$, global Lipschitz 
+	%continuity instead of Borel measurability and 
+	%the linear growth condition \ref{SDE Zusatzannahme} to the drift and diffusion coefficients. 
+	%The literature distinguish between weak and strong solutions of stochastic differential %equation.\footnote{The definition of a 
+	%weak solution can be found in definition 3.1 from chapter 5.3 \cite{Karatzas2012} and 
+	%the definition of a strong solution can be found in definition 2.1 from chapter 5.2 %\cite{Karatzas2012}.} 
+	%A strong solution of a stochastic differential equation is also a weak solution. 
+	%Considering the theorems 2.5 and 2.9 in \cite{Karatzas2012} we note that with our additional 
+	%requirements a weak and strong solution of a stochastic differential equation exists and this 
+	%solution is unique\footnote{By uniqueness we 
+	%	mean uniqueness up to indistinguishability as defined in definition 1.4 %\cite{StoProSchmidt2021}}.
+	%Therefore, a distinction between weak and strong solutions makes no difference in our setting.
+	%We will also see that the stochastic differential equations considered in this thesis will all 
+	%satisfy this stronger requirements.
+	
+	\subsubsection{Ornstein-Uhlenbeck Process} \label{Ornstein-Uhlenbeck background}
+	
+	In this section we take a closer look at the Ornstein-Uhlenbeck process as a solution 
+	of a particular stochastic differential equation. This process will play an important role in the application of our methods in Chapter \ref{Kap. Simulation study}. We first define the Ornstein-Uhlenbeck process in the one-dimensional case and compute its explicit representation. Then we want to extend this concept to any number of dimensions.\\
+	%Let us now consider the stochastic differential equation in more detail. For this purpose we define an one-dimensional Ornstein-Uhlenbeck process.
+	Let in the following $(\Omega, \mathcal{F}, P)$ be a probability space with filtration $\mathbb{F}$ 
+	that satisfies the usual conditions.
+	\begin{definition}[Ornstein-Uhlenbeck process]\label{Def 1dim OUP}
+		Let $x_0,\mu\in\R$ and constants $\vartheta,\sigma>0$ be given. An one-dimensional stochastic process $X$ is called 
+		\textsl{Ornstein-Uhlenbeck process} with initial value $x_0$, equilibrium level $\mu$, stiffness  $\vartheta$ and diffusion $\sigma$ if it solves the stochastic inital value problem 
+		\begin{align}
+			\begin{split}
+				\mathrm{d}X_t &= \vartheta\cdot (\mu-X_t)\mathrm{d}t +\sigma \mathrm{d}W_t\\
+				X_0&=x_0. \label{SDE eines 1dim OUP}
+			\end{split}
+		\end{align}
+	\end{definition}
+	\noindent
+	
+	The initial value $x_0$ of an Ornstein-Uhlenbeck process describes the value of the process at the starting time. The equilibrium level $\mu$ describes the value which the paths of the process approach over time and the stiffness $\vartheta$ is the ``attraction"\ of the equilibrium level on the process. If $\vartheta$ is larger, the process will approach $\mu$  more quickly. The diffusion $\sigma$ describes the stochastic influence of the Brownian motion $W$. If $\sigma = 0$, the process will simply converge exponentially to $\mu$ 
+	but if the diffusion is larger this convergence will be increasingly randomly perturbed.
+	Figure \ref{Abb Pfade OUP} represents different paths of the Ornstein-Uhlenbeck process with initial value $x_0=0$, equilibrium level $\mu = 3$, stiffness $\vartheta = 5$ and diffusion $\sigma =1$.
+	
+	\begin{theorem}[Existence and uniqueness of an Ornstein-Uhlenbeck process]\label{OUP ex and unique 1dim}
+		Let $x_0,\mu\in\R$ and constants $\vartheta,\sigma>0$ be given. Then there exists a unique 
+		stochastic process $X$ that solves the stochastic initial value problem \ref{SDE eines 1dim OUP}.
+	\end{theorem}
+
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.8\textwidth]{Paths_OUP_new}
+		\caption{Representation of eight paths of an Ornstein-Uhlenbeck process.}
+		\label{Abb Pfade OUP}
+	\end{figure}
+
+	\begin{proof}[Proof of Theorem \ref{OUP ex and unique 1dim}]
+		In order to show that a unique solution of this stochastic differential equation exists 
+		we must show that the additional requirements of Theorem \ref{Strong sol ex un} are satisfied.
+		First, we note that the second moment 
+		of $x_0$ exists if the initial value $x_0$ is a constant in $\R$. Considering the drift coefficient $b(t,x)= \vartheta(\mu-x)$ and the diffusion coefficient $\boldsymbol{\sigma}(t, x) = \sigma$ we see that 
+		for all $t, t'\geq 0$ and $x, x'\in\R$ we have
+		\begin{align*}
+			\abs{\abs{b(t, x) -b(t',x')}} &= \abs{\vartheta(\mu-x) -\vartheta(\mu-x')}\\
+			&= \vartheta\cdot \abs{x - x'} \\
+			&\leq \vartheta \cdot(\abs{t-t} + \abs{x-x'})\\
+			&= \vartheta\cdot \abs{\abs{(t, x) - (t',x')}}
+		\end{align*}
+		and 
+		\begin{align*}
+			\abs{\abs{\boldsymbol{\sigma}(t, x) -\boldsymbol{\sigma}(t',x')}} = \abs{\sigma - \sigma} = 0 < \sigma\cdot \abs{\abs{(t, x) - (t',x')}}.
+		\end{align*}
+		Thus $b$ and $\boldsymbol{\sigma}$ are globally Lipschitz continuous functions with 
+		Lipschitz constants $\vartheta$ and $\sigma$.
+		\newpage
+		Further, we note that 
+		for the summed up Lipschitz constants $K:=\vartheta+\sigma$ and for all $t\geq 0$ and $x\in\R$
+		\begin{align*}
+			\abs{\abs{b(t,x)}}^2 + \abs{\abs{\boldsymbol{\sigma}(t,x)}}^2 &= \abs{\abs{\vartheta(\mu -x)}}^2 + \sigma^2 \\
+			&= \vartheta^2 \abs{(\mu + 1) - (1+x)}^2 + \sigma^2 \\
+			&\leq \vartheta^2 \abs{1+x}^2 + \sigma^2 \abs{1+x}^2 \\
+			&\leq (\vartheta + \sigma)^2 \abs{1+x}^2\\
+			&= K^2 \abs{\abs{1+x}}^2
+		\end{align*}
+		holds which means $b$ and $\boldsymbol{\sigma}$ satisfy the linear growth condition \ref{SDE Zusatzannahme}. As mentioned in Theorem \ref{Strong sol ex un} these conditions are sufficient for the existence and uniqueness of a strong  
+		solution of the stochastic initial value problem.
+	\end{proof}
+
+	
+	
+	In the following theorem we want to show that the solution of the initial value problem \ref{SDE eines 1dim OUP} has an explicit representation.
+	\begin{theorem}[Explicit representation of an Ornstein-Uhlenbeck process]
+		Let $x_0,\mu\in\R$ and $\vartheta,\sigma>0$ be constants. The solution of the stochastic initial value problem \ref{SDE eines 1dim OUP} has the following explicit representation
+		\begin{align} \label{1dim expl repr OUP}
+			X_t = x_0 e^{-\vartheta t}+\mu(1-e^{-\vartheta t})+\sigma \int_0^t e^{-\vartheta (t-s)}\mathrm{d}W_s.
+		\end{align}
+	\end{theorem}
+	
+	\begin{proof}
+		This can be shown by Itô's lemma \ref{Itos lemma}. Let us consider the function  
+		$f\in C^2(\R\times\R_{\geq 0},\R)$ given by $f(X_t,t)=X_t e^{\vartheta t}$. Then the following holds for the partial derivatives
+		\[\partial_x f(X_t,t)=e^{\vartheta t}\qquad \partial_t f(X_t,t)=\vartheta X_t e^{\vartheta t}
+		\qquad \partial_{xx}f(X_t,t)=0.\] 
+		Using Itô's lemma and the fact that $[\mathrm{id},\mathrm{id}]_t=0$, we now get
+		\begin{align*}
+			X_t e^{\vartheta t}=f(X_t,t)&=f(X_0,0) +\int_0^t \partial_x f(X_s,s)\mathrm{d}X_s +
+			\int_0^t \partial_s f(X_s,s)\mathrm{d}s\\
+			&=X_0 + \int_0^t e^{\vartheta s} \mathrm{d}X_s +
+			\int_0^t \vartheta X_s e^{\vartheta s}\mathrm{d}s\\
+			&=X_0 + \int_0^t e^{\vartheta s} (\vartheta(\mu -X_s)\mathrm{d}s +\sigma \mathrm{d}W_s) +
+			\int_0^t \vartheta X_s e^{\vartheta s}\mathrm{d}s\\
+			&=X_0 +\vartheta \mu \int_0^t e^{\vartheta s}\mathrm{d}s +
+			\sigma \int_0^t e^{\vartheta s}\mathrm{d}W_s \\
+			&=X_0 + \mu (e^{\vartheta t}-1) + \sigma \int_0^t e^{\vartheta s}\mathrm{d}W_s.
+		\end{align*}
+		If we multiply this equation by $e^{-\vartheta t}$ we get 
+		\[X_t = X_0 e^{-\vartheta t} +\mu (1-e^{-\vartheta t}) +\sigma\int_0^t e^{-\vartheta(t-s)}\mathrm{d}W_s,\]
+		which gives the above solution with $X_0\equiv x_0$.
+	\end{proof}
+
+	We now want to extend this to $d\in\N$ dimensions.
+	
+	\begin{definition}[Multidimensional Ornstein-Uhlenbeck process] \label{Def multidim  OUP}
+		Let $X$ be a $d$-dimensional stochastic process and a vector $\mu\in\R^d$, 
+		an invertible
+		matrix $\Sigma\in\R^{d\times d}$ and the diagonal matrix $\boldsymbol{\sigma}\in\R^{d\times d}$
+		are given. The stochastic process $X$ is called $d$-dimensional Ornstein-Uhlenbeck process with initial value $x_0\in\R^d$, equilibrium level $\mu$, stiffness matrix 
+		$\Sigma$ and dispersion matrix $\boldsymbol{\sigma}$ 
+		if it solves the following stochastic initial value problem
+		\begin{align}
+			\begin{split}
+				\mathrm{d}X_t &= \Sigma\cdot (\mu-X_t)\mathrm{d}t +\boldsymbol{\sigma} \mathrm{d}W_t\\
+				X_0&=x_0. \label{ddim_OUP}
+			\end{split}
+		\end{align}
+	\end{definition}
+	\noindent
+	We assume that the dispersion matrix is a diagonal matrix. 
+	We further note that the Brownian motion is $d$-dimensional instead of an $r$-dimensional process compared to definition \ref{Def SDE}.
+	
+	\begin{theorem}[Existence and uniqueness of the solution of a multidimensional Ornstein-Uhlenbeck process]\label{multdim OUP ex and un}
+		Let vectors $x_0,\mu\in\R^d$, an invertible matrix $\Sigma\in\R^{d\times d}$ and a 
+		diagonal matrix $\boldsymbol{\sigma}\in\R^{d\times d}$ be given. Then a unique strong solution of the stochastic 
+		differential equation \ref{ddim_OUP} exists.
+	\end{theorem}
+
+	\begin{proof}
+		The proof can be done analogously to the proof of Theorem \ref{OUP ex and unique 1dim} in the one-dimensional case. The Lipschitz constants are given by $\abs{\abs{\Sigma}}$ and $\abs{\abs{\boldsymbol{\sigma}}}$, where $\abs{\abs{\cdot}}$ is 
+		a suitable matrix norm on $\R^{d\times d}$.
+	\end{proof}
+
+	\begin{theorem}\label{OUP is markovian}
+		Let $X$ be the $d$-dimensional Ornstein-Uhlenbeck process solving the stochastic initial value problem \ref{ddim_OUP}. Then $X$ is a Markov process.
+	\end{theorem}
+	
+	\begin{proof}
+		From Theorem \ref{multdim OUP ex and un} we know that the Ornstein-Uhlenbeck process is a 
+		unique strong solution of the stochastic initial value problem \ref{ddim_OUP}. Then 
+		with Theorem 21.15 \cite{Pfaffelhuber2020} follows that $X$ is a Markov process.
+	\end{proof}
+	
+	In the following our goal is to find a suitable multidimensional explicit representation of the $d$-dimnesional Ornstein-Uhlenbeck process. If the stiffness matrix $\Sigma$ is a diagonal matrix with nonvanishing entries this explicit multidimensional representation should correspond to the component-wise one-dimensional explicit representation \ref{1dim expl repr OUP}. For this purpose let us now show the following theorem.
+	
+	\begin{theorem}[Explicit representation of a multidimensional Ornstein-Uhlenbeck process]\label{Thm expl repr d dim OUP} \label{OUP d dim Lsg}
+		Let $X$ be a $d$-dimensional Ornstein-Uhlenbeck process with initial value $x_0\in\R^d$,  equilibrium level $\mu\in\R^d$, invertible stiffness matrix $\Sigma\in\R^{d\times d}$ 
+		and diagonal dispersion matrix $\boldsymbol{\sigma}\in\R^{d\times d}$. Then the solution $X$ of the stochastic initial value problem \ref{ddim_OUP} is explicitly given by
+		\begin{align} \label{multidim expl repr OUP}
+			X_t = e^{-\Sigma t}x_0+\mu-e^{-\Sigma t}\mu+\int_0^t e^{-\Sigma(t-s)}\boldsymbol{\sigma}\mathrm{d}W_s.
+		\end{align}
+	\end{theorem}
+	\noindent
+	For a matrix $\Sigma$ the \textsl{matrix exponential} $exp:\R^{d\times d}\to \R^{d\times d}$ is given by the series representation 
+	\[exp(\Sigma)= \sum_{n=0}^{\infty} \frac{\Sigma^n}{n!},\]
+	where $\Sigma^0$ corresponds to the unit matrix $E_d$. In order to prove 
+	Theorem \ref{OUP d dim Lsg} we have to look at a few more rules of calculation. 
+	If $A,B\in\R^{d\times d}$ are matrices that commute, i.e. $AB = BA$, we have the following rule of calculation 
+	\[exp(A+B)=exp(A)\cdot exp(B),\]
+	because
+	\begin{align*}
+		exp(A+B)&\ \ =\ \ \sum_{n=0}^{\infty} \frac{(A+B)^n}{n!}\\
+		&\overset{\text{binom.}}{\underset{\text{thm.}}{=}}
+		\sum_{n=0}^{\infty}\sum_{k=0}^n \frac{\binom{n}{k}}{n!}A^k B^{n-k}\\
+		&\ \ =\ \ \sum_{n=0}^{\infty}\sum_{k=0}^n \frac{A^k}{k!}\frac{B^{n-k}}{(n-k)!}\\
+		&\overset{\text{Cauchy}}{\underset{\text{prod.}}{=}}
+		\left(\sum_{n=0}^{\infty}\frac{A^n}{n!}\right)\cdot \left(\sum_{n=0}^{\infty}\frac{B^n}{n!}\right)\\
+		&\ \ =\ \ exp(A)\cdot exp(B)
+	\end{align*}
+	holds. Since the matrix $A$ obviously commutates with $-A$
+	\[e^{A}e^{-A}= E_d = e^{-A}e^{A}\]
+	holds, where $E_d$ is the $d$-dimensional unit matrix.
+	The entries $exp(A)_{ij}$ of the matrix $exp(A)$ for $i,j=1,\ldots,d$ are represented by
+	\begin{align}
+		exp(A)_{ij}=\left(\sum_{n=0}^{\infty}\frac{A^n}{n!}\right)_{ij}
+		=\sum_{n=0}^{\infty}\frac{A^n_{ij}}{n!}
+		=\delta_{ij}+\sum_{n=1}^{\infty}\frac{A^n_{ij}}{n!}.\label{Eintr_exp_mat}
+	\end{align}
+	Here $\delta_{ij}$ stands for the Kronecker delta and by $A^n_{ij}$ we refer to the $ij$-th entry of the matrix $A^n$.
+	
+	\begin{proof}[Proof of Theorem \ref{OUP d dim Lsg}]
+		The stochastic initial value problem 
+		\ref{ddim_OUP} for all $i=1,\ldots,d$ can be written as
+		\begin{align}
+			\begin{split}
+				\mathrm{d}X_t^i &= (\Sigma\cdot (\mu-X_t))_i\mathrm{d}t +\boldsymbol{\sigma}_{ii} \mathrm{d}W_t^i
+				=\sum_{j=1}^d \Sigma_{ij}(\mu_j-X_t^j)\mathrm{d}t+\boldsymbol{\sigma}_{ii} \mathrm{d}W_t^i\\
+				X_0^i&=x_0^i, \label{ddim_OUP_komponentenweise}
+			\end{split}
+		\end{align}
+		where $X = (X^1,\ldots,X^d)$. 
+		The proof of this theorem is analogous to the proof in the one-dimensional case where we can apply Itô's lemma \ref{Itos lemma} component-wise and reassemble the equation at the end. 
+		For this purpose for $i=1,\ldots,d$ we consider the functions 
+		$f^i:\R^d\times \R_{\geq 0}\to\R$ defined by 
+		\[f^i(X_t,t)=(e^{\Sigma t}X_t)_i = \sum_{j=1}^d e^{\Sigma t}_{ij}X_t^j.\]
+		The partial derivatives in the direction $X^k$ are calculated for $k=1,\ldots,d$ by
+		\begin{align}
+			\partial_{X^k}f^i(X_t,t)=\partial_{X^k}\sum_{j=1}^d e^{\Sigma t}_{ij}X_t^j
+			=\sum_{j=1}^d e^{\Sigma t}_{ij}\underbrace{\partial_{X^k}X_t^j}_{=\delta_{kj}}
+			=e^{\Sigma t}_{ik}. \label{ito_part_abl1}
+		\end{align}
+		We see that
+		\[\partial_{X^l X^k}f^i(X_t,t)=0\]
+		holds for all $l=1,\ldots,d$. Further, we calculate
+		\begin{align*}
+			\frac{\mathrm{d}}{\mathrm{d}t} e^{\Sigma t} &= \frac{\mathrm{d}}{\mathrm{d}t} \left(\sum_{n=0}^{\infty} \frac{\Sigma^n t^n}{n!}\right) \\
+			&= \sum_{n=1}^{\infty} \frac{\Sigma^n t^{n-1}}{(n-1)!} \\
+			&= e^{\Sigma t}\Sigma,
+		\end{align*}
+		therefore, 
+		\[\partial_t e^{\Sigma t}X_t = e^{\Sigma t}\Sigma X_t\]
+		is valid. Thus, the partial derivative in direction $t$ is
+		\begin{align}
+			\partial_t f^i(X_t,t) = (e^{\Sigma t}\Sigma X_t)_i. \label{ito_part_abl2}
+		\end{align}
+		
+		%Further, using the fundamental theorem of calculus and Fubini's theorem, we 
+		%calculate, that
+		%\begin{align*}
+		%	\partial_t e^{\Sigma t}_{ij}&\overset{\ref{Eintr_exp_mat}}{=}\partial_t \left(\delta_{ij}+\sum_{n=1}^{\infty} \frac{\Sigma^n_{ij}t^n}{n!}\right)\\
+		%	&= \sum_{n=1}^{\infty}\partial_t \frac{\Sigma^n_{ij}t^n}{n!}\\
+		%	&= \sum_{n=1}^{\infty}\frac{\Sigma^n_{ij}t^{n-1}}{(n-1)!}\\
+		%	&= \sum_{n=0}^{\infty}\frac{\Sigma^{n+1}_{ij}t^{n}}{n!}\\
+		%	&= \Sigma_{ij} +\sum_{n=1}^{\infty}\frac{\Sigma^{n+1}_{ij}t^{n}}{n!}\\
+		%	&= \Sigma_{ij} +\sum_{n=1}^{\infty}\sum_{k=1}^d \Sigma^n_{ik}\Sigma_{kj}\frac{t^{n}}{n!}\\
+		%	&= \sum_{k=1}^d \delta_{ik}\Sigma_{kj} +\sum_{k=1}^d \sum_{n=1}^{\infty}\Sigma^n_{ik} \frac{t^n}{n!}\Sigma_{kj}\\
+		%	&= \sum_{k=1}^d \left(\delta_{ik}+\sum_{n=1}^{\infty}\Sigma^n_{ik}\frac{t^n}{n!}\right)\Sigma_{kj}\\
+		%	&\overset{\ref{Eintr_exp_mat}}{=} \sum_{k=1}^d e^{\Sigma t}_{ik}\Sigma_{kj}\\
+		%	&= (e^{\Sigma t}\Sigma)_{ij}
+		%\end{align*}
+		%holds for all $i,j=1,\ldots,d$. 
+		%Thus, the partial derivative in direction $t$ is
+		%\begin{align}
+		%	\begin{split}
+		%		\partial_t f^i(X_t,t) &= \partial_t\sum_{j=1}^d e^{\Sigma t}_{ij}X_t^j\\
+		%		&=\sum_{j=1}^d \partial_t e^{\Sigma t}_{ij} X_t^j \\
+		%		&=\sum_{j=1}^d (e^{\Sigma t}\Sigma)_{ij}X_t^j\\
+		%		&=(e^{\Sigma t}\Sigma X_t)_i. \label{ito_part_abl2}
+		%	\end{split}
+		%\end{align}
+		Further, the equation
+		\begin{align}
+			\begin{split}
+				\sum_{k=1}^d \int_0^t e^{\Sigma s}_{ik} \sum_{j=1}^d \Sigma_{kj} X_s^j \mathrm{d}s &= \int_0^t \sum_{j=1}^d\left(\sum_{k=1}^d e^{\Sigma s}_{ik} \Sigma_{kj}\right)X_s^j\mathrm{d}s\\
+				&=\int_0^t \sum_{j=1}^d (e^{\Sigma s}\Sigma)_{ij}X_s^j\mathrm{d}s\\
+				&=\int_0^t (e^{\Sigma s}\Sigma X_s)_i \mathrm{d}s. \label{NR:ito1}
+			\end{split}			
+		\end{align}
+		holds. We calculate
+		\begin{align*}
+			\int_0^t e^{\Sigma s}_{ik}\mathrm{d}s &\overset{\ref{Eintr_exp_mat}}{=} \int_0^t \sum_{n=0}^{\infty}\frac{\Sigma^n_{ik}s^n}{n!} \mathrm{d}s\\
+			&\overset{\text{Fub.}}{=} \sum_{n=0}^{\infty}\frac{\Sigma^n_{ik}}{n!}\int_0^t s^n \mathrm{d}s\\
+			&= \sum_{n=0}^{\infty}\frac{\Sigma^n_{ik}t^{n+1}}{(n+1)!}\\
+			&= \sum_{n=0}^{\infty}(\Sigma^{n+1}\Sigma^{-1})_{ik}\frac{t^{n+1}}{(n+1)!}\\
+			&= \sum_{n=0}^{\infty}\sum_{m=1}^d\Sigma^{n+1}_{im}\Sigma^{-1}_{mk}\frac{t^{n+1}}{(n+1)!}\\
+			&= \sum_{m=1}^d\left(\sum_{n=0}^{\infty}\Sigma^{n+1}_{im}\frac{t^{n+1}}{(n+1)!}\right)\Sigma^{-1}_{mk}\\
+			&= \sum_{m=1}^d\left(\sum_{n=0}^{\infty}\frac{\Sigma^{n}_{im}t^{n}}{n!}-\delta_{im}\right)\Sigma^{-1}_{mk}\\
+			&\overset{\ref{Eintr_exp_mat}}{=} \sum_{m=1}^d\left(e^{\Sigma t}_{im}-\delta_{im}\right)\Sigma^{-1}_{mk}\\
+			&= (e^{\Sigma t}\Sigma^{-1})_{ik} -\Sigma^{-1}_{ik},
+		\end{align*}
+		from this follows
+		\begin{align}
+			\begin{split}
+				\int_0^t (e^{\Sigma s}\Sigma \mu)_i\mathrm{d}s
+				&= \int_0^t \sum_{k=1}^d e^{\Sigma s}_{ik}(\Sigma\mu)_k\mathrm{d}s\\
+				&= \sum_{k=1}^d \int_0^t e^{\Sigma s}_{ik} \mathrm{d}s (\Sigma\mu)_k\\
+				&= \sum_{k=1}^d \left((e^{\Sigma t}\Sigma^{-1})_{ik} -\Sigma^{-1}_{ik}\right) (\Sigma\mu)_k\\
+				&= (e^{\Sigma t}\Sigma^{-1}\Sigma\mu)_i -(\Sigma^{-1}\Sigma\mu)_i\\
+				&= (e^{\Sigma t}\mu)_i -\mu_i. \label{NR:ito2}
+			\end{split}
+		\end{align}
+		With the help of these preliminary considerations and by applying Itô's lemma \ref{Itos lemma} 
+		for all $i=1,\ldots,d$ we get
+		\begin{align*}
+			(e^{\Sigma t}X_t)_i &= f^i(X_t,t) \\
+			&\overset{\ref{Itos lemma}}{=} f^i(X_0,0) +\sum_{k=1}^d \int_0^t 
+			\partial_{X^k} f^i(X_s,s)\mathrm{d}X^k_s +\int_0^t \partial_t f^i(X_s,s)\mathrm{d}s\\
+			&\overset{\ref{ito_part_abl1}}{\underset{\ref{ito_part_abl2}}{=}} X_0^i +\sum_{k=1}^d \int_0^t 
+			e^{\Sigma s}_{ik}\mathrm{d}X^k_s +\int_0^t (e^{\Sigma s}\Sigma X_s)_i\mathrm{d}s\\
+			&\overset{\ref{ddim_OUP_komponentenweise}}{=}X_0^i +\sum_{k=1}^d \int_0^t 
+			e^{\Sigma s}_{ik}\left(\sum_{j=1}^d \Sigma_{kj}(\mu_j-X_s^j)\mathrm{d}s+\boldsymbol{\sigma}_{kk} \mathrm{d}W_s^k\right) +\int_0^t (e^{\Sigma s}\Sigma X_s)_i\mathrm{d}s\\
+			&=X_0^i +\sum_{k=1}^d \int_0^t 
+			e^{\Sigma s}_{ik}\sum_{j=1}^d \Sigma_{kj}\mu_j\mathrm{d}s -\sum_{k=1}^d \int_0^t 
+			e^{\Sigma s}_{ik}\sum_{j=1}^d \Sigma_{kj}X_s^j\mathrm{d}s\\
+			&\qquad+\sum_{k=1}^d \int_0^t 
+			e^{\Sigma s}_{ik}\boldsymbol{\sigma}_{kk} \mathrm{d}W_s^k +\int_0^t (e^{\Sigma s}\Sigma X_s)_i\mathrm{d}s\\
+			&\overset{\ref{NR:ito1}}{=}X_0^i +\sum_{k=1}^d \int_0^t 
+			e^{\Sigma s}_{ik}\sum_{j=1}^d \Sigma_{kj}\mu_j\mathrm{d}s+\sum_{k=1}^d \int_0^t 
+			e^{\Sigma s}_{ik}\boldsymbol{\sigma}_{kk} \mathrm{d}W_s^k\\
+			&=X_0^i +\sum_{k=1}^d \int_0^t 
+			e^{\Sigma s}_{ik} (\Sigma\mu)_k\mathrm{d}s+\sum_{k=1}^d \int_0^t 
+			e^{\Sigma s}_{ik}\boldsymbol{\sigma}_{kk} \mathrm{d}W_s^k\\
+			&=X_0^i + \int_0^t 
+			(e^{\Sigma s}\Sigma\mu)_i\mathrm{d}s+\sum_{k=1}^d \int_0^t 
+			e^{\Sigma s}_{ik}\boldsymbol{\sigma}_{kk} \mathrm{d}W_s^k\\
+			&\overset{\ref{NR:ito2}}{=}X_0^i + (e^{\Sigma t}\mu)_i -\mu_i+\sum_{k=1}^d \int_0^t 
+			e^{\Sigma s}_{ik}\boldsymbol{\sigma}_{kk} \mathrm{d}W_s^k.
+		\end{align*}
+		In the second equation we used that the second partial derivatives always vanish. This is valid because all partial derivatives not directed to $t$ vanish according to the initial remark and for the second partial derivatives in direction $t$ the integrator vanishes. 
+		If we now put the above equations together we get 
+		\[e^{\Sigma t}X_t=X_0+e^{\Sigma t}\mu-\mu +\left(\sum_{k=1}^d\int_0^t 
+		e^{\Sigma s}_{ik}\boldsymbol{\sigma}_{kk}\mathrm{d}W_s^k\right)_{i=1,\ldots,d}.\]
+		If we multiply this equation from the left by $e^{-\Sigma t}$ we obtain
+		\begin{align*}
+			X_t &= e^{-\Sigma t}X_0 +\mu -e^{-\Sigma t}\mu +e^{-\Sigma t}\left(\sum_{k=1}^d\int_0^t 
+			e^{\Sigma s}_{ik}\boldsymbol{\sigma}_{kk}\mathrm{d}W_s^k\right)_{i=1,\ldots,d}\\
+			&=e^{-\Sigma t}X_0 +\mu -e^{-\Sigma t}\mu +\left(\sum_{j=1}^d e^{-\Sigma t}_{ij}\sum_{k=1}^d\int_0^t 
+			e^{\Sigma s}_{jk}\boldsymbol{\sigma}_{kk}\mathrm{d}W_s^k\right)_{i=1,\ldots,d}\\
+			&=e^{-\Sigma t}X_0 +\mu -e^{-\Sigma t}\mu +\left(\sum_{k=1}^d\int_0^t\sum_{j=1}^d e^{-\Sigma t}_{ij} 
+			e^{\Sigma s}_{jk}\boldsymbol{\sigma}_{kk}\mathrm{d}W_s^k\right)_{i=1,\ldots,d}\\
+			&=e^{-\Sigma t}X_0 +\mu -e^{-\Sigma t}\mu +\left(\sum_{k=1}^d\int_0^t e^{-\Sigma(t-s) }_{ik} \boldsymbol{\sigma}_{kk}\mathrm{d}W_s^k\right)_{i=1,\ldots,d}\\
+			&= e^{-\Sigma t}X_0+\mu-e^{-\Sigma t}\mu+\int_0^t e^{-\Sigma(t-s)}\boldsymbol{\sigma}\mathrm{d}W_s.
+		\end{align*} 
+		By setting $X_0\equiv x_0$ we are done with the proof.
+	\end{proof}
+	
+	We note that in the case of independent components of a $d$-dimensional Ornstein-Uhlenbeck process, the explicit representation \ref{multidim expl repr OUP} of the process agrees component-wise with the one-dimensional explicit representation \ref{1dim expl repr OUP}. 
+	Due to this representation of the Ornstein-Uhlenbeck process we obtain the following theorem.
+	
+	\begin{theorem}
+		Let $X$ be a $d$-dimensional Ornstein-Uhlenbeck process as described in Theorem \ref{Thm expl repr d dim OUP}. The process $X_t$ is then multivariate normally distributed with 
+		mean vector 
+		\[M_{x_0}(t) = e^{-\Sigma t} x_0 + (E_d -e^{-\Sigma t})\mu\]
+		and covariance matrix
+		\begin{align*}
+			\omega(t) = \int_{0}^t e^{-\Sigma (t-s)}\boldsymbol{\sigma}^2 e^{-\Sigma^\text{T}(t-s)}\mathrm{d}s.
+		\end{align*}
+	\end{theorem}
+		
+	\begin{proof}
+		By Theorem \ref{Thm expl repr d dim OUP} we note that $X_t$ is normally distributed because the integrand of the integral corresponding to the Brownian motion $W$ is deterministic. 
+		By the explicit representation of $X_t$ we note that
+		\begin{align*}
+			\E[X_t] &= \E\left[e^{-\Sigma t}x_0+\mu-e^{-\Sigma t}\mu+\int_0^t e^{-\Sigma(t-s)}\boldsymbol{\sigma}\mathrm{d}W_s\right]\\
+			&=e^{-\Sigma t}x_0+\mu-e^{-\Sigma t}\mu +\underbrace{\E\left[\int_0^t e^{-\Sigma(t-s)}\boldsymbol{\sigma}\mathrm{d}W_s\right]}_{=0}\\
+			&=e^{-\Sigma t}x_0+\mu-e^{-\Sigma t}\mu
+		\end{align*}
+		holds and by
+		\[X_t-\E[X_t]= \int_0^t e^{-\Sigma(t-s)}\boldsymbol{\sigma}\mathrm{d}W_s\]
+		and the Itô-isometry (Lemma 3.1.5 \cite{Oksendal2002}) follows
+		\[\V[X_t]=\E[(X_t -\E[X_t])^2] = \E\left[\left(\int_0^t e^{-\Sigma(t-s)}\boldsymbol{\sigma}\mathrm{d}W_s\right)^2\right] = \int_0^t e^{-\Sigma(t-s)}\boldsymbol{\sigma}^2 e^{-\Sigma^\text{T}(t-s)}\mathrm{d}s.\]
+	\end{proof}
+	
+	In the following section we will look at an alternative way to determine the distribution of an Ornstein-Uhlenbeck process. For this purpose we consider the Fokker-Planck equation.
+	
+	\clearpage
+	\subsection{The Fokker-Planck Equation}\label{Fokker-Planck}
+	
+	In this section we want to introduce the Fokker-Planck equation for stochastic differential 
+	equations. This equation describes the time evolution of the probability density function 
+	of the stochastic differential equations solution. We apply this equation to an 
+	Ornstein-Uhlenbeck process and be able to calculate its probability density function explicitly.
+	
+	\begin{definition}[Fokker-Planck equation for stochastic differential equations]
+		Let a stochastic differential equation
+		\begin{align*}
+			\mathrm{d}X_t &= b(t, X_t)\mathrm{d}t + \boldsymbol{\sigma}(t, X_t)\mathrm{d}W_t \label{SDE}
+		\end{align*}
+		for a $d$-dimensional drift vector, a $d\times r$-dimensional dispersion matrix $\boldsymbol{\sigma}$ and an $r$-dimensional Brownian motion $W$ be given. Then 
+		the probability density function $P_t$ for $X_t$ satisfies the \textsl{Fokker-Planck equation}
+		\begin{align*}
+			\frac{\partial}{\partial t}P_t(x) = -\frac{\partial}{\partial x}b(t,x)P_t(x) +
+			\frac{\partial^2}{\partial x^2}D(t, x)P_t(x)
+		\end{align*}
+		for the \textsl{diffusion tensor} $D = \frac{1}{2} \boldsymbol{\sigma}\boldsymbol{\sigma}^{\mathrm{T}}$.
+	\end{definition}
+	
+	We now want to apply the Fokker-Planck equation to the Ornstein-Uhlenbeck process from Definition 
+	\ref{Def multidim  OUP} and determine its probability density function. In this section we rely on section 6.5 of \cite{Risken1996} and \cite{Vatiwutipong2019}.
+	
+	\begin{corollary}[Fokker-Planck equation of an Ornstein-Uhlenbeck process]\label{coroll FP of OUP}
+		Let $X$ be a $d$-dimensional Ornstein-Uhlenbeck process solving the following stochastic inital value problem
+		\begin{align*}
+			\begin{split}
+				\mathrm{d}X_t &= \Sigma\cdot (\mu-X_t)\mathrm{d}t +\boldsymbol{\sigma} \mathrm{d}W_t\\
+				X_{t_0}&=x_0.
+			\end{split}
+		\end{align*}
+		where $x_0\in\R^d$ is the initial value at time $t_0\geq 0$, $\Sigma\in\R^{d\times d}$ is an invertible matrix, $\mu\in\R^d$ is a vector and $\boldsymbol{\sigma}\in\R^{d\times d}$ is a diagonal matrix. We assume that $\Sigma$ is a diagonal matrix with nonvanishing diagonal entries. 
+		Therefore, the eigenvalues $\lambda_1\ldots,\lambda_d$ of $\Sigma$ can be read directly from the diagonal. 
+		The probability density function of the Ornstein-Uhlenbeck process can be described by the Fokker-Planck equation
+		\begin{align*}
+			\frac{\partial}{\partial t}P_t(x) = -\left(\frac{\partial}{\partial x}\Sigma(\mu-x)P_t(x)\right) + \frac{\partial^2}{\partial x^2}\frac{\boldsymbol{\sigma}^2 P_t(x)}{2}
+		\end{align*}
+		with initial condition\footnote{Eq. 6.109 \cite{Risken1996} respectively eq. 7 \cite{Vatiwutipong2019}.}
+		\[P_{t_0}(x\vert x_0)=\mathds{1}_{\{x=x_0\}}(x).\]
+	\end{corollary}
+	
+	In the following theorem we note that an Ornstein-Uhlenbeck process is normally distributed.
+	
+	\begin{theorem}[Distribution of an Ornstein-Uhlenbeck process]
+		Let $X$ be a $d$-dimensional Ornstein-Uhlenbeck process satisfying the stochastic 
+		initial value problem described in corollary \ref{coroll FP of OUP}. Then for the stochastic 
+		process $X$ every $X_t$ for $t\geq t_0$ has a $d$-dimensional normal distribution with mean vector
+		\begin{align}
+			M_{x_0}(t-t_0)=e^{-\Sigma (t-t_0)}x_0 +(E_d-e^{-\Sigma (t-t_0)})\mu \label{OUP mean vector}
+		\end{align}
+		and covariance matrix
+		\begin{align}
+			\omega(t-t_0) = \int_{t_0}^t e^{-\Sigma (t-s)}\boldsymbol{\sigma}^2 e^{-\Sigma^\text{T}(t-s)}\mathrm{d}s. \label{OUP covariance matrix}
+		\end{align}
+	\end{theorem}
+
+	\begin{proof}
+		This theorem can be shown by calculating the characteristic function of the 
+		Ornstein-Uhlenbeck process by taking the Fourier transformation of the 
+		associated Fokker-Planck equation and applying the method of characteristics. 
+		A detailed prove can be found in Theorem 1 \cite{Vatiwutipong2019}.
+	\end{proof}
+	
+	To compute the vector $M$ and the matrix $\omega$ more precisely we need to find a complete biorthogonal set\footnote{This ansatz originates on the part from \cite{Risken1996} around equations 6.119 to 6.123 where the notation is adapted to our setting and we calculate the individual terms directly.} of 
+	the matrix $\Sigma$, i.e. we need to find column vectors $u_{\lambda_1},\ldots,u_{\lambda_d}$ and row vectors $v_{\lambda_1},\ldots,v_{\lambda_d}$ such that
+	\[\Sigma u_{\lambda_i}=\lambda_i u_{\lambda_i}\qquad \text{and} \qquad
+	v_{\lambda_i}\Sigma=\lambda_i v_{\lambda_i}\]
+	holds for all $i=1,\ldots,d$ and the orthonormality and completeness relation
+	\[\left(\sum_{k=1}^d v_{\lambda_k}^i u_{\lambda_k}^j\right)_{i,j=1,\ldots,d}=E_d\qquad 
+	\text{and} \qquad \left(u_{\lambda_j}^i v_{\lambda_k}^i\right)_{j,k=1,\ldots,d} = E_d\]
+	holds for all $i=1,\ldots,d$. Such a set exists if all eigenvectors $\lambda_1,\ldots,\lambda_d$ are different. With loss of generality we can assume that they are different. Otherwise, we can add the individual values in each case with an $\varepsilon$ and take the limit $\varepsilon\to 0$ at the end. With our assumption that $\Sigma$ is a diagonal matrix we notice that this set just consists of the standard normal basis of $\R^d$, i.e. 
+	$u_{\lambda_i}=e_i$ and $v_{\lambda_i}=e_i^{\text{T}}$ for all $i=1,\ldots,d$. 
+	The spectral decomposition of the matrix $\Sigma$ then reads
+	\[\Sigma = \left(\sum_{k=1}^d \lambda_k u_{\lambda_k}^i v_{\lambda_k}^j\right)_{i,j=1,\ldots,d}=\left(\sum_{k=1}^d \lambda_k \delta_{ik}\delta_{kj}\right)_{i,j=1,\ldots,d} = 
+	\begin{pmatrix}
+		\lambda_1 & 0 &\cdots & 0 \\
+		0 & \lambda_2 & \cdots & 0 \\
+		\vdots & \vdots & \ddots & \vdots \\
+		0 & 0 & \cdots & \lambda_d
+	\end{pmatrix}\]
+	what we expect. We now have 
+	\begin{align*}
+		e^{-\Sigma t} = \left(\sum_{k=1}^d e^{-\lambda_k t}u_{\lambda_k}^i v_{\lambda_k}^j\right)_{i,j=1,\ldots,d}
+		\hspace{-1em}=\left(\sum_{k=1}^d e^{-\lambda_k t}\delta_{ik}\delta_{kj}\right)_{i,j=1,\ldots,d}
+		\hspace{-1em}= 
+		\begin{pmatrix}
+			e^{-\lambda_1 t} & 0 &\cdots & 0 \\
+			0 & e^{-\lambda_2 t} & \cdots & 0 \\
+			\vdots & \vdots & \ddots & \vdots \\
+			0 & 0 & \cdots & e^{-\lambda_d t}
+		\end{pmatrix}.
+	\end{align*}
+	By inserting this expression in \ref{OUP mean vector} and \ref{OUP covariance matrix} we 
+	get the mean vector and can perform the 
+	integration and obtain
+	\begin{align*}
+		M_{x_0}(t-t_0) &= e^{-\Sigma (t-t_0)}x_0 +(E_d-e^{-\Sigma (t-t_0)})\mu \\
+		&= \begin{pmatrix}
+			e^{-\lambda_1 (t-t_0)} & 0 &\cdots & 0 \\
+			0 & e^{-\lambda_2 (t-t_0)} & \cdots & 0 \\
+			\vdots & \vdots & \ddots & \vdots \\
+			0 & 0 & \cdots & e^{-\lambda_d (t-t_0)}
+		\end{pmatrix}
+		x_0 \\
+		&\qquad+ \begin{pmatrix}
+			1 - e^{-\lambda_1 (t-t_0)} & 0 &\cdots & 0 \\
+			0 & 1 - e^{-\lambda_2 (t-t_0)} & \cdots & 0 \\
+			\vdots & \vdots & \ddots & \vdots \\
+			0 & 0 & \cdots & 1 - e^{-\lambda_d (t-t_0)}
+		\end{pmatrix}
+		\mu \\
+		&= \begin{pmatrix}
+			e^{-\lambda_1 (t-t_0)} ((x_0)_1 - \mu_1) + \mu_1 \\
+			\vdots \\
+			e^{-\lambda_d (t-t_0)} ((x_0)_d - \mu_d) + \mu_d
+		\end{pmatrix}
+		%&= \left(\sum_{k=1}^d e^{-\lambda_k t}\right)E_d x' + \left(E_d -\left(\sum_{k=1}^d e^{-\lambda_k t}\right)E_d\right)\mu \\
+		%&= \sum_{k=1}^d e^{-\lambda_k t} x' + \left(1-\sum_{k=1}^d e^{-\lambda_k t}\right)\mu\\
+		%&= \sum_{k=1}^d e^{-\lambda_k t} (x'-\mu) +\mu
+	\end{align*}
+	and\footnote{In this calculation $\delta$ is the Kronecker delta.}
+	\begin{align*}
+		\omega(t-t_0)_{i,j} &= 2 \sum_{k,l=1}^d \frac{1-e^{-(\lambda_k+\lambda_l)(t-t_0)}}{\lambda_k+\lambda_l}
+		v_{\lambda_k}\hspace{-0.01\textwidth}\underbrace{\frac{\boldsymbol{\sigma}^2}{2}}_{\text{diag.mat.}}\hspace{-0.01\textwidth}v_{\lambda_l}^\text{T} \underbrace{u_{\lambda_k}^i}_{=\delta_{ik}} \underbrace{u_{\lambda_l}^j}_{=\delta_{jl}}\\
+		&= \sum_{k,l=1}^d \frac{1-e^{-(\lambda_k+\lambda_l)(t-t_0)}}{\lambda_k+\lambda_l} 
+		\delta_{kl} \boldsymbol{\sigma}^2_{kl} \delta_{ik}\delta_{jl}\\
+		&= \frac{1- e^{-2\lambda_i (t-t_0)}}{2\lambda_i} \boldsymbol{\sigma}_{ii}^2 \delta_{ij}
+		%&= \sum_{k=1}^d \frac{1-e^{-2\lambda_k t}}{2\lambda_k}\sigma_k^2 \delta_{ij}
+	\end{align*}
+	which can be read as 
+	\[\omega(t-t_0) = \begin{pmatrix}
+		\frac{1- e^{-2\lambda_1 (t-t_0)}}{2\lambda_1} \boldsymbol{\sigma}_{11}^2  & 0 &\cdots & 0 \\
+		0 & \frac{1- e^{-2\lambda_2 (t-t_0)}}{2\lambda_2} \boldsymbol{\sigma}_{22}^2  & \cdots & 0 \\
+		\vdots & \vdots & \ddots & \vdots \\
+		0 & 0 & \cdots & \frac{1- e^{-2\lambda_d (t-t_0)}}{2\lambda_d} \boldsymbol{\sigma}_{dd}^2 
+	\end{pmatrix}.\]
+	Thus, we obtain that the probability density function $P_{t,t_0}$ or transition probability $P_{t,t_0}(x\vert x_0)$ of $x$ with 
+	given initial value $x_0$ at time $t_0$ can be represented by
+	\begin{align}
+		P_{t,t_0}(x\vert x_0) = \frac{1}{\sqrt{(2\pi)^d det(\omega(t-t_0))}}\exp\left(-\frac{1}{2}(x- M_{x_0}(t-t_0))^{\text{T}}\omega^{-1}(t-t_0)(x-M_{x_0}(t-t_0))\right).\label{prop dens func}
+	\end{align}
+	See also Equation 6.124 \cite{Risken1996}.
+	
+	We recall from Theorem \ref{OUP is markovian} that the Ornstein-Uhlenbeck process is a Markov process. We now have calculated the probability density function of the process with the initial value $x_0$ at time $t_0$. Thus, the probability density function for the time difference $t-t_0$ is given for all $t\geq t_0$. This means that this probability density function depends only on the time difference $t-t_0$ but not on the time points themselves. Consequently, the Ornstein-Uhlenbeck process is a time-homogeneous Markov process described as in Definition \ref{Def time homog}.\\	
+	Finally, we summarize the previous results in the following corollary.
+	\newpage
+	\begin{corollary}[Distribution of an Ornstein-Uhlenbeck process]\label{coroll OUP Eigenschaften}
+		Let $X$ be a $d$-dimensional Ornstein-Uhlenbeck process with initial time $t_0\geq 0$ solving the following stochastic inital value problem
+		\begin{align*}
+			\begin{split}
+				\mathrm{d}X_t &= \Sigma\cdot (\mu-X_t)\mathrm{d}t +\boldsymbol{\sigma} \mathrm{d}W_t\\
+				X_{t_0}&=x_0
+			\end{split}
+		\end{align*}
+		where $\Sigma\in\R^{d\times d}$ is an invertible matrix, $\mu,x_0\in\R^d$ are vectors and $\boldsymbol{\sigma}\in\R^{d\times d}$ is a diagonal matrix. We assume that $\Sigma$ is a diagonal matrix with nonvanishing diagonal entries and eigenvalues $\lambda_1,\ldots,\lambda_d$. \\
+		Then we obtain that $X$ is an time-homogeneous Markov process and $X_t$ is for all $t\geq t_0$ normally distributed with mean vector
+		\begin{align*}
+			M_{x_0}(\delta_t) &= e^{-\Sigma \delta_t}x_0 +(E_d-e^{-\Sigma \delta_t})\mu
+			= \begin{pmatrix}
+				e^{-\lambda_1 \delta_t} ((x_0)_1 - \mu_1) + \mu_1 \\
+				\vdots \\
+				e^{-\lambda_d \delta_t} ((x_0)_d - \mu_d) + \mu_d
+			\end{pmatrix}
+		\end{align*}
+		and covariance matrix
+		\[\omega(\delta_t) = \begin{pmatrix}
+			\frac{1- e^{-2\lambda_1 \delta_t}}{2\lambda_1} \boldsymbol{\sigma}_{11}^2  & 0 &\cdots & 0 \\
+			0 & \frac{1- e^{-2\lambda_2 \delta_t}}{2\lambda_2} \boldsymbol{\sigma}_{22}^2  & \cdots & 0 \\
+			\vdots & \vdots & \ddots & \vdots \\
+			0 & 0 & \cdots & \frac{1- e^{-2\lambda_d \delta_t}}{2\lambda_d} \boldsymbol{\sigma}_{dd}^2 
+		\end{pmatrix},\]
+		where $\delta_t := t-t_0$. 
+		Thus, the probability density function $P_t$ or transition probability $P_{\delta_t}(x\vert x_0)$ of $x$ at time $t$ with 
+		given initial value $x_0$ at time $t_0$ can be represented by
+		\begin{align*}
+			P_{\delta_t}(x\vert x_0) = \frac{1}{\sqrt{(2\pi)^d det(\omega(\delta_t))}}\exp\left(-\frac{1}{2}(x- M_{x_0}(\delta_t))^{\text{T}}\omega^{-1}(\delta_t)(x-M_{x_0}(\delta_t))\right).
+		\end{align*}
+	\end{corollary}
+
+	The normal distribution of the Ornstein-Uhlenbeck process that we determined with this corollary is illustrated in Figure \ref{Abb Empirische Verteilung1}.
+	\clearpage
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[width=0.6\textwidth]{Empirische_Verteilung}
+		\caption{Schematic representation of the normal distribution of an Ornstein-Uhlenbeck process.}
+		\label{Abb Empirische Verteilung1}
+	\end{figure}
+	
+	\newpage
+	\ 
+	\newpage
+	
+	\section{Methods} \label{sec methods}
+	
+	%In klinischen Kohortenstudien in denen Krankheiten untersucht werden und welche den Gesundheitszustand der Studienteilnehmer erfassen und auswerten sollen, werden typischerweise an unterschiedlichen Zeitpunkten Messwerte der Teilnehmer ermittelt. Diese weisen je nach Krankheitszustand gewisse latente Entwicklungsmuster über die Zeit auf. Wir nehmen an, dass sich diese Entwicklung durch einen Ornstein-Uhlenbeck Prozess beschreiben lässt. Lässt sich dieser Prozess parametrisieren, so können Vorhersagen über den zukünftigen Krankheitsverlauf der Patienten getroffen werden. Bei jedem Patienten kann die Entwicklung des Zustandes über die Zeit allerdings von patientenspezifischen Merkmalen abhängen. Da diese Merkmale den Zustand beeinflussen, empfiehlt es sich in der Studie zusätzlich zu den zeitlich gemessenen Werten Baseline Variablen zu erfassen. Die Entwicklung des Zustandes der Patienten deren Variablen Ähnlichkeiten aufweisen können sich ähneln, sodass sich Patienten in unterschiedliche Gruppen einteilen lassen. Ein naives Beispiel hierfür ist die Unterteilung der Studienteilnehmer in solche die gesund sind und solche die an der zu untersuchenden Krankheit leiden. Das Ziel bei der Analyse solcher Daten ist zum einen den Ornstein-Uhlenbeck Prozess jedes Individuums anhand der Baseline Variablen zu parametrisieren und zum anderen implizit die Gruppenstruktur zu lernen. Dieses setting ist motiviert durch den SMArtCARE Datensatz, welcher Daten zu Patienten enthält die an spinaler Muskelatrophie leiden. Die Patienten lassen sich durch Alter und schwere der Krankheitssymptome in unterschiedliche Gruppen einteilen und die Messungen der motorischen Fähigkeiten weisen individuelle Entwicklungsmuster basierend auf zughörigen Gruppe auf. Außerdem weisen diese Daten eine hohe zeitliche Unregelmäßigkeit auf. 
+	%In diesem Kapitel legen wir zunächst das allgemeine setting fest für welches wir unsere Methoden entwickeln wollen. Es werden drei verschiedene Methoden vorgestellt zur Analyse der im Setting beschriebenen Daten. Diese Methoden wurden chronologisch entwickelt und bauen im Wissen aufeinander auf. Die erste Methode approximiert den latenten Prozess basierend auf dem Euler-Maruyama Verfahren. Die zweite Methode konzentriert sich auf das Erlernen der Drift und Diffusionsparameter des Prozesses anhand verschiedener Verlustfunktionen. Die letzte Methode nutzt die Eigenschaften eines Ornstein-Uhlenbeck Prozesses aus und modelliert so dessen  Wahrscheinlichkeitsdichtefunktion. 
+	
+	Clinical cohort studies that investigate diseases are intended to record and to evaluate the health status of the participants. In the course of such studies, measurements of the individual participants are typically taken at different points in time. These measurements exhibit certain latent patterns of development over time, depending on the disease state. We assume that this development can be described in terms of an Ornstein-Uhlenbeck process. Once this process is parameterized, predictions about the future course of the patient's disease can be determined. However, for each patient the development of the condition over time may depend on patient-specific characteristics. Since these characteristics influence the condition it is recommended that baseline variables are collected during the study in addition to the values measured over time. The development of the condition of patients whose variables have similarities can be similar. As a consequence, patients can be divided into different groups. A naive example is the division of study participants into those who are healthy and those who suffer from the disease being studied. The goal in analyzing such data is, on the one hand, to parameterize the Ornstein-Uhlenbeck process of each individual using the baseline variables and, on the other hand, to learn implicitly the group structure. This setting is motivated by the SMArtCARE dataset which contains data on patients suffering from spinal muscular atrophy. Patients can be classified into different groups by their age and severity of their symptoms. Further, the patients' measurements consisting of data on motor skills show certain individual latent developmental patterns based on the associated group. %Furthermore, the measurements of motor skills show individual developmental patterns based on their associated group.
+	Additionally, these time series data present a highly temporal irregularity.\\
+	In this chapter we first specify the general setting for which we will develop the methods. Three different methods will be introduced to analyze the data described in the setting. The knowledge gained from the application of each of these methods is incorporated in the subsequent methods. The first method approximates the latent process based on the Euler-Maruyama method \ref{Def Eul Mar method}. The second method focuses on learning the drift and diffusion parameters of the process using various loss functions. The last method exploits the properties of an Ornstein-Uhlenbeck process mentioned in \ref{Fokker-Planck} in order to model its probability density function. 
+	
+	\clearpage
+	\subsection{Setting} \label{Methods:Setting}
+	In this section we introduce the general setting to which our developed methods will be applied.\\
+	
+	Let $N\in\N$ be the number of patients and some timepoints $0<\tau^i_1\leq \ldots\leq \tau^i_{n_i}<\infty$ are given for $n_i\in\N_{\geq 2}$ and $i=1,\ldots,N$. 
+	We refer to the individual first time $\tau^i_1$ as \textsl{study entry}. Now let   $\mathcal{X}=(\mathcal{B},\mathcal{M})$ be the data set where $\mathcal{B} = \{B^1, \ldots, B^N\}$ denotes the \textsl{set of baseline variables} with 
+	individual \textsl{baseline variables} $B^i\in\R^{n_\mathcal{B}}$ for every individual $i\in\{1,\ldots,N\}$ and $\mathcal{M}=\{M^1,\ldots,M^N\}$ denotes the \textsl{set of the series of measurements} with individual series of 
+	measurements $M^i\in\R^{D\times n_i}$ for every individual $i\in\{1,\ldots,N\}$. Here $n_\mathcal{B}\in\N$ describes the number of  \textsl{baseline variables} per patient and $D\in\N$ the number of variables measured over time. 
+	By $M^i_j\in\R^D$ we denote the measured values of the $i$-th patient at time 
+	$\tau_j^i$ 
+	by the $j$-th column of $M^i$ 
+	for all $j\in\{1,\ldots,n_i\}$ and $i\in\{1,\ldots,N\}$.
+	\\
+	Further, let $\Phi_\mathcal{M}\in\mathcal{N}\mathcal{N}(S_\mathcal{M})$ be a neural network with architecture $S_\mathcal{M}:= (D, D, d)$ and realization 
+	\[R(\Phi_\mathcal{M})(M^i_j) = Z^i_j\in\R^{d}\]
+	for all $j=1,\ldots,{n_i}$ and $i\in\{1,\ldots,N\}$ where $d\in\N$ with $d\ll D$.
+	
+	%$\Phi_\mathcal{M}:\R^{D\times N}\to \R^{d\times N}$ be a neural network with \[\Phi_\mathcal{M}(M_j)=Z_j\in\R^{d\times N}\] for all $j=1,\ldots,{n_i}$, where $d\in\N$ with $d\ll D$. 
+	By $\mathcal{Z}=\{Z^1,\ldots,Z^N\}$ we denote the \textsl{set of encoded states} 
+	with individual \textsl{encoded states} $Z^i\in\R^{d\times n_i}$ for every 
+	individual $i\in\{1,\ldots,N\}$. 
+	Analogously to the definition of $M^i_j$ we define by $Z^i_j\in\R^d$ the latent measurements of the $i$-th patient at time $\tau^i_j$ for all $j\in\{1,\ldots,n_i\}$ and  $i\in\{1,\ldots,N\}$.\\
+	We now assume that the \textsl{latent state} $Z^i=(Z^i_t)_{t\geq 0}$ of the $i$-th patient for  $i\in\{1,\ldots, N\}$ can be described in terms of a $d$-dimensional Ornstein-Uhlenbeck process with unobserved initial state $Z^i_0\in \R^d$. Furthermore, we assume that the process at times 
+	$\tau^i_j$ just corresponds to the encoded states $Z^i_j$, i.e. it is 
+	$Z^i_{\tau^i_j}=Z^i_j$ for $j\in\{1,\ldots,n_i\}$. Thus, the process for all $i=1,\ldots,N$ solves the  stochastic initial value problem
+	\begin{align}
+		\begin{split} 
+			\mathrm{d}Z_t^i &= \Sigma^i \cdot (\mu^i- Z_t^i)\mathrm{d}t +\boldsymbol{\sigma}^i \mathrm{d}W_t\\
+			Z^i_0 &= Z^i_0, \label{SDE OUP}
+		\end{split} 
+	\end{align}
+	where $\mu^i\in\R^d$ is a vector, $\Sigma^i\in\R^{d\times d}$ is an invertible diagonal matrix, $\boldsymbol{\sigma}^i\in\R^{d\times d}$ is a diagonal matrix and $W$ is a $d$-dimensional Brownian motion. Applying the Euler-Maruyama method \ref{Def Euler-Maruyama method} 
+	we obtain that 
+	the process $Z^i$ can be approximated by the difference equation
+	\[Z^i_{j+1} = Z_j^i + \Sigma^i \mu^i - \Sigma^i Z_j^i + \varepsilon^i\]
+	for all $j=1,\ldots, n_i -1$ with initial condition $Z^i_{\tau^i_1} = Z^i_1$. The time points were chosen equidistant with step width $1$. 
+	Here $\varepsilon^i=(\varepsilon^i_1,\ldots,\varepsilon^i_d)$ are 
+	indipendent random variables with 
+	$\varepsilon^i_l \sim\mathcal{N}(0,(\boldsymbol{\sigma}^i_{ll})^2)$ for all $l=1,\ldots,d$. 
+	Let $\sigma^i =(\boldsymbol{\sigma}^i_{11},\ldots,\boldsymbol{\sigma}^i_{dd})$ then
+	\[\varphi^i:=(\mu^i,\Sigma^i,\sigma^i)\in\R^d\times \R^{d\times d}\times \R_+^d\]
+	describes the parameter of the difference equation and stochastic differential equation, respectively. We assume that these parameters can be modeled by the realization the  
+	neural network $\Phi_\mathcal{B}\in\mathcal{N}\mathcal{N}(S_\mathcal{B})$ with architecture $S_\mathcal{B} := (n_\mathcal{B}, n_\mathcal{B}, 3d, 3d)$ such that
+	\[R(\Phi_\mathcal{B})(B^i)=\varphi^i\]
+	holds for all $i\in\{1,\ldots,N\}$.\\
+	
+	%We now assume that the \textsl{latent state} $Z^i=(Z^i_t)_{t\geq 0}$ of the $i$-th patient for  $i\in\{1,\ldots, N\}$ as a $d$-dimensional  
+	%stochastic process can be described by a stochastic differential equation with 
+	%unobserved 
+	%initial state $Z^i_0\in \R^d$. Furthermore, we assume that the process at times 
+	%$\tau_j$ just corresponds to the encoded states $Z^i_j$, i.e. it is 
+	%$Z^i_{\tau_j}=Z^i_j$ for $j\in\{1,\ldots,n_i\}$.
+	%This differential equation is given for all $i=1,\ldots,N$ by the stochastic initial 
+	%value problem
+	%\begin{align}
+	%	\begin{split} 
+	%		\mathrm{d}Z^i &= (\mu^i+\Sigma^i Z^i)\mathrm{d}t +\sigma^i \mathrm{d}W\\
+	%		Z^i_0 &= Z^i_0, \label{SDE OUP}
+	%	\end{split} 
+	%\end{align}
+	%where $\mu^i\in\R^d$, $\Sigma^i\in\R^{d\times d}$ invertible, 
+	%$\sigma^i\in\R_{\geq 0}^d$ 
+	%and $W$ is a standard Brownian motion. With the Euler-Maruyama method \ref{Def Euler-Maruyama %method} this differential 
+	%equation has for all $i=1\ldots,N$ 
+	%the following difference equation as an approximation
+	%\begin{align}
+	%	Z^i_{j+1}=Z^i_j+\mu^i +\Sigma^i Z^i_{j}+\varepsilon^i \label{Difference-Equation}
+	%\end{align}
+	%for $j=1,\ldots,n_i-1$, where $\varepsilon^i=(\varepsilon^i_1,\ldots,\varepsilon^i_d)$ are 
+	%indipendent random variables with 
+	%$\varepsilon^i_l \sim\mathcal{N}(0,(\sigma^i_l)^2)$ for all $l=1,\ldots,d$. Let $\sigma^i %=(\sigma^i_1,\ldots,\sigma^i_d)$ then
+	%\[\varphi^i=(\mu^i,\Sigma^i,\sigma^i)\in\R^d\times \R^{d\times d}\times \R_{\geq 0}^d\]
+	%describe the parameter of the difference equation. Let us parameterize these parameters with the 
+	%neural network $\Phi_\mathcal{B}\in\mathcal{N}\mathcal{N}(S_\mathcal{B})$ with architectur %$S_\mathcal{B} := (B, B, 2d + d^2, 2d + d^2)$, such that for the 
+	%realization
+	%\[R(\Phi_\mathcal{B})(B^i)=\varphi^i\]
+	%holds for all $i\in\{1,\ldots,N\}$.
+	%%$\Phi_\mathcal{B}:\R^B\to \R^d\times \R^{d\times d}\times \R_{\geq 0}^d$. 
+	%%It holds \[\Phi_\mathcal{B}(\mathcal{B}^i)=\theta^i\] for all $i\in\{1,\ldots,N\}$.\\
+	%Let us now consider equation \ref{SDE OUP} with the background knowledge from 
+	%section \ref{Ornstein-Uhlenbeck background}. If the matrix $\Sigma^i$ is a diagonal matrix with %non-vanishing diagonal entries, equation \ref{SDE OUP} is composed of the following components
+	%\begin{align}
+	%	\begin{split} 
+	%		\mathrm{d}Z^i_l &= (\mu^i_l+\Sigma^i_{ll} Z^i_l)\mathrm{d}t +\sigma^i_l\mathrm{d}W_l\\
+	%		{Z^i_0}_l &= Z^i_{1_l} \label{compwise init val prob}
+	%	\end{split} 
+	%\end{align}
+	%for all $l=1,\ldots,d$. Thus, we see that each of the components is an one-dimensional Ornstein-Uhlenbeck process with initial value $Z^i_{1_l}$, 
+	%equilibrium level $-(\Sigma^i_{ll})^{-1}\mu^i_l$, stiffness $-\Sigma^i_{ll}$ and diffusion 
+	%$\sigma^i_l$. So now the question remains what the solution 
+	%of the stochastic initial value problem is if $\Sigma^i$ is not a diagonal matrix. For this purpose we want to extend the stochastic initial value problem of the one-dimensional Ornstein-Uhlenbeck process to $d$ dimensions and solve it. We will see later that the solution in the multidimensional case corresponds to the above mentioned component-wise solution. First, we define a $d$-dimensional Ornstein-Uhlenbeck process.
+	We can summarize the assumptions of our setting as follows. For each patient an individual time series of measured values is given. These measurements were taken at individual specific time points. Additionally, the baseline variables are given for each individual. The series of measured values has a lower dimensional representation for each patient which can be described in terms of an Ornstein-Uhlenbeck process. This process can be parameterized using the baseline variables.\\
+	We will use the methods developed in the following sections to implement this setting. These methods have emerged in the course of this thesis and have constantly evolved. They each differ fundamentally in their approach. Each method has its strengths and weaknesses. The main goal of the methods is to determine the parameters of the Ornstein-Uhlenbeck process in the latent space based on the baseline variables. We will see later in the results that one of the major difficulties is to determine the stochasticity that is included in the data.
+	
+	\clearpage
+	\subsection{Method: Euler-Maruyama}\label{sec Eul Mar}
+	
+	A first naive approach is to encode the data and approximate the solution of the Ornstein-Uhlenbeck process using the Euler-Maruyama method in the latent space. For this purpose the encoder network is used to obtain the initial value from the series of measurements. Further, the baseline network is used to obtain the parameters of the process from the baseline variables. With these values an approximation of the solution can then be determined.\\
+	
+	Let $\mathcal{X}$ be the data set, $0<\tau^i_1\leq \ldots\leq \tau^i_{n_i}<\infty$ be the individual time points for $n_i\in\N$ and $i=1,\ldots,N$ and $\mathcal{Z}$ be the latent encoded state as described in section \ref{Methods:Setting}. 
+	We note that the latent state $Z^i$ of an individual $i$ can again be described as an Ornstein-Uhlenbeck process with unobserved initial 
+	value $Z_0^i$. Consequently, it solves the stochastic initial value problem
+	\begin{align*}
+		\begin{split} 
+			\mathrm{d}Z^i &= \Sigma^i(\mu^i- Z^i)\mathrm{d}t +\boldsymbol{\sigma}^i \mathrm{d}W\\
+			Z^i_0 &= Z^i_0
+		\end{split} 
+	\end{align*}
+	where $\mu^i\in\R^d$ is a vector, $\Sigma^i\in\R^{d\times d}$ is an invertible diagonal matrix, $\boldsymbol{\sigma}^i\in\R^{d\times d}$ is a diagonal matrix and $W$ is a $d$-dimensional Brownian motion. Since the initial value $Z_0^i$ is unobserved and the data is known only from the individual study entry $\tau^i_1$, the process can be modeled from that time point. The first measured value is given by  $Z^i_{\tau_1}$ and $Z^i_1$, respectively. 
+	To obtain a numerical approximate solution we apply the Euler-Maruyama method mentioned in Definition \ref{Def Eul Mar method}. For this, let $\delta^i_{j}:= \tau^i_{j+1}-\tau^i_{j}$ for $j=1,\ldots,n_i -1$. 
+	Thus, as an approximation of the solution the values $\hat{Z}^i_2,\ldots, \hat{Z}^i_{n_i}$ at the time points $\tau^i_2,\ldots,\tau^i_{n_i}$ with initial value $Z^i_1$ at $\tau^i_1$ are given by
+	\begin{align*}
+		\begin{split} 
+			\hat{Z}^i_{j+1} &= \hat{Z}^i_{j} + \Sigma^i(\mu^i- \hat{Z}_{j}^i)\delta^i_j +\boldsymbol{\sigma}^i \varepsilon^i\\
+			\hat{Z}^i_{\tau^i_1} &= Z^i_1
+		\end{split} 
+	\end{align*}
+	for $j=1,\ldots, n_i -1$. The term $\varepsilon^i$ is a $d$-dimensional vector whose entries are sampled from $\mathcal{N}(0,\delta^i_j)$. In order to reconstruct the data series using this approximate solution we introduce the decoder network $\Phi_{\hat{\mathcal{M}}}$ with architecture $S_{\hat{\mathcal{M}}}=(d,D,D)$, such that $\hat{\mathcal{M}}$ is the reconstructed set of series of measurements. Thus, with the neural network $\Phi_\mathcal{M}$ we have an autoencoder $AE(\Phi_\mathcal{M},\Phi_{\hat{\mathcal{M}}})$ as described in Definition \ref{Def autoencoder}. Let $\theta_\mathcal{M}$ and $\theta_{\hat{\mathcal{M}}}$ be the parameters belonging to these networks and $\theta_\mathcal{B}$ be the parameters belonging to the baseline network $\Phi_\mathcal{B}$. We define the parameters $\theta_\mathrm{EM}$ of this model by $\theta_\mathrm{EM}= (\theta_\mathcal{M},\theta_{\hat{\mathcal{M}}}, \theta_\mathcal{B})$. Then we define the loss function $L_{\mathrm{EM}}$ by the summed column-wise squared error loss 
+	\begin{align*}
+		L_{\mathrm{EM}}(\theta_\mathrm{EM}, M^i) &= \sum_{j=1}^{n_i} \abs{\abs{M^i_j- \hat{M}^i_j}}_2^2\\
+		&= \sum_{j=2}^{n_i} \abs{\abs{M^i_j- R(\Phi_{\hat{\mathcal{M}}})(\hat{Z}^i_j)}}_2^2\\
+		&= \sum_{j=2}^{n_i} \abs{\abs{M^i_j- R(\Phi_{\hat{\mathcal{M}}})(\mathrm{EM}(Z^i_1, \varphi^i))}}_2^2\\
+		&= \sum_{j=2}^{n_i} \abs{\abs{M^i_j- R(\Phi_{\hat{\mathcal{M}}})(\mathrm{EM}(R(\Phi_\mathcal{M})(M^i_1), R(\Phi_\mathcal{B})(B^i)))}}_2^2
+	\end{align*}
+	for every series of measurements $M^i\in \mathcal{M}$ whose $j$-th column is denoted by $M^i_j\in\R^D$ with the corresponding baseline vector $B^i\in\mathcal{B}$. By $EM(Z^i_1, \varphi^i)$ we denote the application of the above mentioned Euler-Maruyama method using the initial encoded state $Z^i_1$ and the parameters $\varphi^i$ with corresponding time points $\tau^i_1, \ldots,\tau^i_{n_i}$.
+	We train these networks using the gradient descent algorithm \ref{Gradient Descent} from section \ref{subsec training NNs}. 
+	A schematic representation of the model can be found in figure \ref{Abb Euler Mar method}.
+	
+	
+	\begin{figure}[!h]
+		\makebox[\textwidth]{
+			\includegraphics[width=\textwidth]{Modell_Euler-Maruyama.png}}
+		\caption{Schematic Representation of the Euler-Maruyama method.}
+		\label{Abb Euler Mar method}
+	\end{figure}
+	
+	\subsection{Method: Covariance Loss}\label{sec cov loss}
+	
+	In this method we split the learning of the drift and diffusion parameters of the Ornstein-Uhlenbeck process by finding them by using different terms in the loss function. In addition to the reconstruction loss already presented in the first method, we introduce two new loss functions. In order to learn the drift term we introduce the latent reconstruction loss. The idea of this loss function is that the approximation of the solution determined within the latent space is as close as possible to the states encoded by the encoder network. To learn the diffusion term, we further introduce the covariance loss. The idea hereby is to learn the stochasticity of the data by the covariance of the encoded states.\\
+
+	Let the data set $\mathcal{X}$ and the encoded data $\mathcal{Z}$ be given as described in section \ref{Methods:Setting}. Again the assumption applies that the latent state $Z^i$ of an individual $i$ can be described in terms of the stochastic initial value problem corresponding to an Ornstein-Uhlenbeck process
+	\begin{align*}
+		\begin{split} 
+			\mathrm{d}Z_t^i &= \Sigma^i \cdot (\mu^i- Z_t^i)\mathrm{d}t +\boldsymbol{\sigma}^i \mathrm{d}W_t\\
+			Z^i_0 &= Z^i_0, 
+		\end{split} 
+	\end{align*}
+	where $\mu^i\in\R^d$ is a vector, $\Sigma^i\in\R^{d\times d}$ is an invertible diagonal matrix, $\boldsymbol{\sigma}^i\in\R^{d\times d}$ is a diagonal matrix and $W$ is a $d$-dimensional Brownian motion. For simplicity, we will omit the $i$ of the $i$-th patient in this section and write $Z$ instead of $Z^i$. The same applies to the parameters and time points. We recall that this initial value problem without the posterior summand is an ordinary differential equation. The posterior summand represents the stochastic influence of the Brownian motion on the solution. Considering the initial value problem without the last summand we get the ordinary initial value problem
+	\begin{align*}
+		\begin{split} 
+			\mathrm{d}Z_t &= \Sigma \cdot (\mu- Z_t)\mathrm{d}t\\
+			Z_0 &= Z_0. 
+		\end{split} 
+	\end{align*}
+	In Corollary \ref{coroll OUP Eigenschaften} we saw that an Ornstein-Uhlenbeck process is normally distributed. Let us now consider the expected value $M_{Z_0}$ of this process that is for all $t\geq 0$ given by
+	\begin{align*}
+		M_{Z_0}(t) = e^{-\Sigma t}Z_0 +(E_d-e^{-\Sigma t})\mu.
+	\end{align*}
+	Then
+	\begin{align*}
+		\frac{\mathrm{d} M_{Z_0}(t)}{\mathrm{d}t}&= \frac{\mathrm{d}}{\mathrm{d}t}\left(e^{-\Sigma t}Z_0 + (E_d -e^{-\Sigma t})\mu\right)\\
+		&=-\Sigma e^{-\Sigma t}Z_0 + \Sigma e^{-\Sigma t}\mu\\
+		&=\Sigma \mu -\Sigma e^{-\Sigma t}Z_0 -\Sigma \mu +\Sigma e^{-\Sigma t}\mu\\
+		&=\Sigma \cdot (\mu - M_{Z_0}(t))
+	\end{align*}
+	holds with $M_{Z_0}(0) = Z_0$. This means that the Ornstein-Uhlenbeck in expectation is a solution of the ordinary initial value problem. Since the initial value $Z_0$ is unobserved and the data is known only from the individual study entry $\tau_1$, the solution can be modeled from that time point. The first encoded value is given by $Z_{\tau_1}$ and $Z_1$, respectively. By using the solution $M$ with given initial encoded value $Z_1$ we can determine the remaining latent states $\hat{Z}_j$ at times $\tau_j$ by
+	\[\hat{Z}_j = M_{Z_1}(\tau_j - \tau_1)\]
+	for all $j=2,\ldots,n_i$. To obtain the reconstructed set of series of measurements $\hat{\mathcal{M}}$ using the latent data series determined in this way we use the decoder network $\Phi_{\hat{\mathcal{M}}}$. Let $\theta_\mathcal{M}$ and $\theta_{\hat{\mathcal{M}}}$ be the parameters belonging to the encoder and decoder networks. We define the parameters of the autoencoder consisting of the encoder and decoder network $\theta_\mathrm{AE}$ by $\theta_\mathrm{AE}= (\theta_\mathcal{M},\theta_{\hat{\mathcal{M}}})$. In order to train the autoencoder network we introduce the \textsl{reconstruction loss}. This loss is based on the loss function described in method 1 but depends on the parameters of the autoencoder. The \textsl{reconstruction loss} $L_\mathrm{rec}$ is defined by the summed up column-wise squared error loss
+	\begin{align*}
+		L_{\mathrm{rec}}(\theta_\mathrm{AE}, M^i) &= \sum_{j=2}^{n_i} \abs{\abs{M^i_j- \hat{M}^i_j}}_2^2\\
+		&= \sum_{j=2}^{n_i} \abs{\abs{M^i_j- R(\Phi_{\hat{\mathcal{M}}})(\hat{Z}^i_j)}}_2^2\\
+		&= \sum_{j=2}^{n_i} \abs{\abs{M^i_j- R(\Phi_{\hat{\mathcal{M}}})(M_{Z^i_1}(\tau^i_j -\tau^i_1))}}_2^2
+	\end{align*}
+	for every series of measurements $M^i\in \mathcal{M}$ whose $j$-th column is denoted by $M^i_j\in\R^D$ with corresponding baseline vector $B^i\in\mathcal{B}$. To learn the parameters $\theta_\mathcal{B}$ of the baseline network $\Phi_\mathcal{B}$ we introduce two more loss functions. \\
+	In order to learn the parameters of this ordinary differential equation and the drift parameters of the stochastic differential equation, respectively, we introduce the \textsl{latent reconstruction loss}. This loss function ensures that the latent data series $\hat{Z}$ determined in the latent space matches the encoded states as closely as possible. We have indicated this condition as $Z_{\tau_j}=Z_j$. 
+	The \textsl{latent reconstruction loss} $L_\mathrm{latrec}$ is defined by
+	\[L_\mathrm{latrec}(\theta_\mathcal{B}, Z^i) = \sum_{j=2}^{n_i}\abs{\abs{Z_j - \hat{Z}_{\tau_j}}}^2_2\]
+	for all $Z^i\in\mathcal{Z}$ whose $j$-th column is denoted by $Z^i_j\in\R^{d}$ with the  corresponding baseline vector $B^i\in\mathcal{B}$. In comparison to the reconstruction loss and the loss function from method 1 this loss function uses the entire encoded data series.\\ 
+	Further, to learn the diffusion parameter of the stochastic differential equation we introduce the \textsl{covariance loss}. 
+	Considering the quadratic covariation process $[Z^k, Z^l]$ of the latent process $Z$ defined in Definition \ref{Def quadr covariation} we note that with Lemma \ref{lemma covariation} for all $k,l=1,\ldots,d$ and $t>0$
+	\begin{align*}
+		\sum\limits_{j=2}^{n_i} (Z^k_{\tau_j}-Z^k_{\tau_{j-1}})(Z^l_{\tau_{j}}-Z^l_{\tau_{j-1}}) \xrightarrow{n_i \rightarrow \infty}_p [Z^k,Z^l]_t
+	\end{align*}
+	holds. Further, according to the properties of the covariation and $Z$ we know that
+	\begin{align*}
+		[Z^k,Z^l]_t &= \left[ \int_{\tau_1}^t (\Sigma(\mu - Z_s))_k \, ds + \int_{\tau_1}^t \boldsymbol{\sigma}_{kk} \mathrm{d}W_s^k, \int_{\tau_1}^t (\Sigma(\mu - Z_s))_l \, ds + \int_{\tau_1}^t \boldsymbol{\sigma}_{ll} \mathrm{d}W_s^l \right]\\
+		&= \left[ \int_{\tau_1}^t \boldsymbol{\sigma}_{kk} \mathrm{d}W_s^k, \int_{\tau_1}^t \boldsymbol{\sigma}_{ll} \mathrm{d}W_s^l \right]\\
+		&=\int_{\tau_1}^t \sigma_k \boldsymbol{\sigma}_{ll} \mathrm{d}\underbrace{[W^k,W^l]_s}_{=s}\\
+		&= \boldsymbol{\sigma}_{kk} \boldsymbol{\sigma}_{ll} (t-\tau_1)
+	\end{align*}
+	holds. 
+	In the second equality we used that the quadratic covariation of two continuous processes vanishes if one of them is a semimartingale and the other one is a process of bounded variation, see also Theorem 7.4 \cite{StoProSchmidt2021}. In the third equation we used the chain rule that can also be seen in Corollary 19.37 \cite{Pfaffelhuber2020} and the fact that for a Brownian motion $[W]_t=t$ holds. This property can be shown by Lemma 2.19 (iii) \cite{Schmidt2021Fima} using that $W^2 -t$ is a local martingale and the process $X_t = t$ is of locally bounded variation. \\
+	We are now able to define the third loss function. The \textsl{covariance loss} $L_\mathrm{cov}$ is defined by
+	\[L_\mathrm{cov}(\theta_\mathcal{B}, B^i) = \sum_{k,l=1}^d \left(\sum_{j=2}^{n_i} \left(Z^k_{\tau_{j}}-Z^k_{\tau_{j-1}}\right)\left(Z^l_{\tau_{j}}-Z^l_{\tau_{j-1}}\right)-\sigma_k\sigma_l(\tau_{n_i}-\tau_1)\right).\]
+	We effectively just learn the diffusion matrix $\boldsymbol{\sigma} \boldsymbol{\sigma}^\text{T}$, but $\boldsymbol{\sigma}$ can not be determined better. \\
+	Finally, we define the \textsl{general covariance loss} $L_\mathrm{CL}$ belonging to the parameters of the model $\theta_\mathrm{CL} = (\theta_\mathrm{AE},\theta_\mathcal{B})$ by
+	\[L_\mathrm{CL}(\theta_\mathrm{CL}, (M^i, B^i)) = L_\mathrm{rec}(\theta_{\mathrm{AE}}, M^i) + \alpha_\mathrm{latrec} L_\mathrm{latrec}(\theta_\mathcal{B}, Z^i) + \alpha_\mathrm{cov}L_\mathrm{cov}(\theta_\mathcal{B}, B^i),\]
+	for every $M^i\in\mathcal{M}$ with corresponding $B^i\in\mathcal{B}$ and corresponding $Z^i\in\mathcal{Z}$. Here, the positive constants $\alpha_\mathrm{latrec}$ and $\alpha_\mathrm{cov}$ are hyperparameters that are determined during the evaluation of the model. We train the networks using the gradient descent algorithm \ref{Gradient Descent} from section \ref{subsec training NNs}. During the training it turned out that first another reconstruction loss has to be used to train the autoencoder network. This ensures that the structure of the data is preserved. Second, the networks are then trained using the  \textsl{general covariance loss}. This will be discussed in more detail in section \ref{sec res cov los}.
+	
+	\clearpage
+	\subsection{Method: Fokker-Planck Equation}\label{sec Method Fokker-Planck}
+	
+	In this method we want to take advantage of the fact that the solution process of a 
+	stochastic differential equation can also be described in terms of a probability 
+	density function which satifies the \textsl{Fokker-Planck equation}. 
+	As we saw in section \ref{Fokker-Planck} the probability density function of an Ornstein-Uhlenbeck process is 
+	normally distributed and can explicitly be represented. This offers us two advantages. First, we are able to learn the parameters of the normal distribution of the process from the empirical distribution of the data. Second, the results of the model can then be visually represented as a density at any point in time.
+	
+	\subsubsection*{Ansatz}
+	
+	Let's start by connecting our setting with the knowledge from section \ref{Fokker-Planck}.\\
+	First, let the data set $\mathcal{X}$ be given as in subsection \ref{Methods:Setting} with time points $0<\tau^i_1\leq \ldots\leq \tau^i_{n_i}<\infty$ for $n_i\in\N$ and $i=1,\ldots,N$. We further assume that the latent state of the $i$-th patient can be described by the $d$-dimensional Ornstein-Uhlenbeck process $Z^i$. Here, at all time points, the values of the process should again match those of the encoded data $Z^i$ realized by the neural network $\Phi_\mathcal{M}$. 
+	The parameters describing this Ornstein-Uhlenbeck process are $\varphi^i = (\mu^i, \Sigma^i, \sigma^i)$. During the training we approximate those parameters by the realized parameters of the baseline network $\Phi_\mathcal{B}$. 
+	For simplicity, we will name these realized parameters equally. Further, we omit the $i$ of the $i$-th patient in this section and write $\varphi = (\mu, \Sigma, \sigma)$ instead of $\varphi^i = (\mu^i, \Sigma^i, \sigma^i)$. The same applies to the latent representation and the time points. 
+	The $d$-dimensional Ornstein-Uhlenbeck process $Z$ solves for all $t\geq 0$ the following stochastic initial value problem
+	\begin{align*}
+		\begin{split}
+			\mathrm{d}Z_t &= \Sigma\cdot (\mu-Z_t)\mathrm{d}t +\boldsymbol{\sigma} \mathrm{d}W_t\\
+			Z_0&=Z_0
+		\end{split}
+	\end{align*}
+	where $\Sigma\in\R^{d\times d}$ is an invertible diagonal matrix, $Z_0\in\R^d$ is the unobserved initial state, $\mu\in\R^d$ is a vector and $\boldsymbol{\sigma}\in\R^{d\times d}$ is a diagonal matrix with diagonal entries belonging to the vector $\sigma\in\R_+^d$. In section \ref{Fokker-Planck} we saw that 
+	the probability density function $P_t$ of $Z_t$ for all $t\geq 0$ satisfies the Fokker-Planck equation
+	\begin{align}
+		\frac{\partial}{\partial t}P_{t} = -\left(\frac{\partial}{\partial z}\Sigma(\mu-z)P_{t}\right) + \frac{\partial^2}{\partial z^2}\frac{\boldsymbol{\sigma}^2 P_{t}}{2}
+		\label{Fokker-Planck Eq}
+	\end{align}
+	with initial condition
+	\[P_0(z\vert Z_0)=\mathds{1}_{\{z=Z_0\}}(z).\]
+	Further, in Corollary \ref{coroll OUP Eigenschaften} we noticed that the Ornstein-Uhlenbeck process is a normally distributed time-homogeneous Markov process. This means the distribution of the Ornstein-Uhlenbeck process only depends on the initial value and the time difference between the initial time and the time at which we want to determine the distribution. The neural network $\Phi_\mathcal{B}$ with which we obtain the approximating parameters $\varphi$ to our process can then be trained using the empirical distribution of the data. We will discuss the training in more detail later.
+	Let us consider the process $Z$ with the assumption that the encoded states $Z_j$ correspond to the values $Z_{\tau_j}$ at times $\tau_j$ for all $j=1,\ldots,n_i$. Then the process with initial time $\tau_j\in\{\tau_1,\ldots,\tau_{n_i}\}$ is also a solution of the stochastic initial value problem
+	\begin{align*}
+		\begin{split}
+			\mathrm{d}Z_t &= \Sigma\cdot (\mu-Z_t)\mathrm{d}t +\boldsymbol{\sigma} \mathrm{d}W_t\\
+			Z_{\tau_j}&=Z_j
+		\end{split}
+	\end{align*}
+	for all $j=1,\ldots,n_i$. 
+	Moreover, from corollary \ref{coroll OUP Eigenschaften} we notice that for $\tau\geq \tau_j$ and $\delta_\tau := \tau-\tau_j$ a solution
+	\begin{align}
+		P_{\delta_\tau}(z\vert Z_j) = \frac{1}{\sqrt{(2\pi)^d det(\omega(\delta_\tau))}}\exp\left(-\frac{1}{2}(z- M_{Z_j}(\delta_\tau))^{\text{T}}\omega^{-1}(\delta_\tau)(z-M_{Z_j}(\delta_\tau))\right) \label{transition prob}
+	\end{align}
+	of the corresponding Fokker-Planck equation exists. Here, the matrix $M_{Z_j}(\delta_\tau)$ is given by
+	\begin{align}\label{OUP Ewert}
+		M_{Z_j}(\delta_\tau)
+		= \begin{pmatrix}
+			e^{-\lambda_1 \delta_\tau} ((Z_j)_1 - \mu_1) + \mu_1 \\
+			\vdots \\
+			e^{-\lambda_d \delta_\tau} ((Z_j)_d - \mu_d) + \mu_d
+		\end{pmatrix}
+	\end{align}
+	where $\lambda_1,\ldots,\lambda_d$ are the eigenvalues of the matrix $\Sigma$. Further, the matrix $\omega(\delta_\tau)$ is given by
+	\begin{align}\label{OUP Covmat}
+		\omega(\delta_\tau) = \begin{pmatrix}
+			\frac{1- e^{-2\lambda_1 \delta_\tau}}{2\lambda_1} \boldsymbol{\sigma}_{11}^2  & 0 &\cdots & 0 \\
+			0 & \frac{1- e^{-2\lambda_2 \delta_\tau}}{2\lambda_2} \boldsymbol{\sigma}_{22}^2  & \cdots & 0 \\
+			\vdots & \vdots & \ddots & \vdots \\
+			0 & 0 & \cdots & \frac{1- e^{-2\lambda_d \delta_\tau}}{2\lambda_d} \boldsymbol{\sigma}_{dd}^2 
+		\end{pmatrix}.
+	\end{align}
+	That means, once we have trained our model, we are able to extrapolate the process at each of the observed time points $\tau_j$ using the associated probability density function. Let us now 
+	consider the process of training in more detail.
+	
+	\subsubsection*{Training}
+	
+	In this subsection we go into more detail about neural network training. Compared to the other methods from sections \ref{sec Eul Mar} and \ref{sec cov loss}, in this method the individual networks are trained in two steps.\\
+	In the first step we want to learn the latent representation of the data. The goal is to keep the structure of the data during encoding as good as possible. If stochasticity is present in the data it should still be present in the latent representation so that it can then be determined appropriately in the second step. We achieve this by first training our autoencoder on the data.\\
+	In the second step of the training we want to train our baseline network. This gives us the individual parameters to the distribution which approximate the real distribution, i.e. empirical distribution, of the data. We can determine the empirical distribution of the individual data using the latent representation learned in the first step. \\
+	
+	Let the autoencoder $AE(\Phi_\mathcal{M}, \Phi_{\hat{\mathcal{M}}})$ be given with encoder network $\Phi_\mathcal{M}$ described above and decoder network $\Phi_{\hat{\mathcal{M}}}$ as in definition \ref{Def autoencoder} from section \ref{subsec NNs}. The neural network $\Phi_\mathcal{M}$ has the architecture $S_\mathcal{M}=(D,D,d)$ as described in section \ref{Methods:Setting} and the network  $\Phi_{\hat{\mathcal{M}}}$ has the architecture $S_{\hat{\mathcal{M}}}=(d,D,D)$. Let $\theta_\mathcal{M}$ and $\theta_{\hat{\mathcal{M}}}$ be the parameters belonging to these networks so $\theta_{\mathrm{AE}}= (\theta_\mathcal{M},\theta_{\hat{\mathcal{M}}})$ be the parameters belonging to the autoencoder. Then we define the loss function $L_{\mathrm{enc-dec}}$ of the autoencoder by the 
+	summed column-wise squared error loss 
+	\[L_{\mathrm{enc-dec}}(\theta_{\mathrm{AE}}, M^i) = \sum_{j=1}^{n_i} \abs{\abs{M^i_j- \hat{M}^i_j}}_2^2 = \sum_{j=1}^{n_i} \abs{\abs{M^i_j- R(AE(\Phi_\mathcal{M}, \Phi_{\hat{\mathcal{M}}}))(M^i_j)}}_2^2\]
+	for every $M^i\in \mathcal{M}$ whose $j$-th column is denoted by $M^i_j\in\R^D$. We train these networks using the gradient descent algorithm \ref{Gradient Descent} from section \ref{subsec training NNs}. A schematic representation of the autoencoder training can be taken from figure \ref{Abb model FP part 1}.
+	\newpage
+	
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width=1\textwidth]{Modell_Fokker-Planck_Part1}
+		\caption{Schematic representation of the autoencoder training corresponding to the Fokker-Planck method.}
+		\label{Abb model FP part 1}
+	\end{figure}
+	
+	Once we have trained our autoencoder and obtained the latent representation, we can train the baseline network $\Phi_\mathcal{B}$ and therefore determine approximately the parameters of the real underlying Ornstein-Uhlenbeck process belonging to this latent representation.
+	Let $\theta_\mathcal{B}$ be the parameters of the neural network $\Phi_\mathcal{B}$. We now exploit that the Ornstein-Uhlenbeck process is a normally distributed time-homogeneous Markov process. \\
+	During the training we want to adjust the individual parameters $\varphi^i$ obtained from the baseline network such that the normal distribution of the given Ornstein-Uhlenbeck process corresponds to the true individual distribution of the data, that is the empirical distribution of the individual latent representation of the data $Z^i$. Assuming that the time evolution of the latent data corresponds to an Ornstein-Uhlenbeck process whose parameters are unknown it is sufficient to learn the parameters of the associated normal distribution. We do this by fitting the expected value vector $M_{Z_j}(\delta_\tau)$ from equation \ref{OUP Ewert} and the covariance matrix $\omega(\delta_\tau)$ from equation \ref{OUP Covmat} to the empirical distribution of the latent data. These distribution parameters depend on the time difference $\delta_\tau$ and the initial value $Z_j$. Note that we want to do this for all individuals $i=1,\ldots, N$. In order to determine the empirical distribution of the data we must first divide the data set $\mathcal{M}$ into different temporal intervals $\delta_\tau$ and then make a subdivision into different initial values. \\
+	If we divide for an individual $i$ the associated time points $\tau^i_1,\ldots, \tau^i_{n_i}$ into all combination of temporal differences $\{\tau^i_l - \tau^i_k\}_{1\leq k <l\leq n_i}$ we get $\frac{n_i(n_i -1)}{2}$ many combinations. A schematic representation of division into temporal differences of the latent representation $Z^i$ of an individual $i$ can be taken from figure \ref{Abb Delta tau Einteilung}.
+	\begin{figure}[h!]
+			\centering
+			\includegraphics[width=0.7\textwidth]{Deltatau_Einteilung_neu}
+			\caption{Schematic representation of the division into temporal differences $\delta_\tau$ of the latent representation $Z^i$ of an individual $i$.}
+			\label{Abb Delta tau Einteilung}
+	\end{figure}
+	For an individual with a high number of observation points we get many possibilities, however, for example for an individual with $n_i=2$ observation points we only get one possibility. For this reason, we need to combine parts  of the data from individuals that are similar. Specifically, this means from individuals whose empirical latent representations have similar distribution parameters. In the context of medical data it has already been mentioned that individuals can be divided into different groups. This is something we do not want to impose on our model but we want our model itself to be able to make such a classification. We achieve this by choosing a suitable mini batch $\mathcal{D}\subset \mathcal{M}$ for an individual $i\in\{1,\ldots,N\}$ consisting of the data of similar individuals to $i$ and $i$ itself. For this purpose, we define 
+	\[\gamma^k := \abs{\abs{\varphi^i - \varphi^k}}_2=\abs{\abs{R(\Phi_\mathcal{B})(B^i) - R(\Phi_\mathcal{B})(B^k)}}_2\]
+	for all $k=1,\ldots, N$. Let $\pi :\{1,\ldots, N\}\to \{1,\ldots, N\}$ be the permutation 
+	of $\{1,\ldots, N\}$ such that 
+	\[\gamma^{\pi(1)}\leq\ldots\leq \gamma^{\pi(N)}.\]
+	We then obtain the mini batch $\mathcal{D}$ by
+	\[\mathcal{D}:= \{M^{\pi(1)},\ldots,M^{\pi(n_{\mathrm{batch}})}\}\]
+	for the size $1\leq n_\mathrm{batch}\leq N$ of the mini batch $\mathcal{D}$. Thus, $\mathcal{D}$ contains the $n_\mathrm{batch}$ series of measurements based on the distance of the parameters $\varphi$ given by the baseline network. We note that $\gamma^i = 0$ such that $\pi(1)=i$ and therefore, $M^i\in\mathcal{D}$. \\
+	One of our assumptions was that individuals could be assigned to different groups. By generating the mini batches as described above we get the advantage that without any additional information about these groups the model is implicitly able to learn a group structure and assign the individuals to these groups.\\
+	Given such a mini batch $\mathcal{D}$ we now want to sort this according to the temporal differences belonging to the mini batch. For this purpose let $\Delta^\mathcal{D}_\tau$ be the 
+	set of all temporal differences given by
+	\[\Delta^\mathcal{D}_\tau := \left\{\tau^{\pi(i)}_l - \tau^{\pi(i)}_k \ \vert \ 1\leq k< l\leq n_{\pi(i)},\  i=1,\ldots,n_\mathrm{batch}\right\}.\]
+	This set contains $\frac{1}{2}\sum_{i=1}^{n_\mathrm{batch}} n_{\pi(i)}(n_{\pi(i)}-1)$ elements. Let further be $\delta_\mathrm{mesh}\in\N$. Then we decompose the interval $\left(\min\{\Delta^\mathcal{D}_\tau\}, \max\{\Delta^\mathcal{D}_\tau\}\right]$ into $\delta_\mathrm{mesh}$ intervals $I_1,\ldots,I_{\delta_\mathrm{mesh}}$ 
+	given by
+	\[I_j = \left(\min\{\Delta^\mathcal{D}_\tau\} + (j-1)\frac{\max\{\Delta^\mathcal{D}_\tau\}- \min\{\Delta^\mathcal{D}_\tau\}}{\delta_\mathrm{mesh}}, \min\{\Delta^\mathcal{D}_\tau\} + j\frac{\max\{\Delta^\mathcal{D}_\tau\}- \min\{\Delta^\mathcal{D}_\tau\}}{\delta_\mathrm{mesh}}\right]\]
+	for $j=1,\ldots,\delta_\mathrm{mesh}$. With these intervals we can partition the set $\Delta_\tau^\mathcal{D}$. 
+	%We define the sets $\Delta^{\mathcal{D},1}_t,\ldots,\Delta_{t}^{\mathcal{D},\delta_\mathrm{mesh}}$ by
+	%\[\Delta_t^{\mathcal{D},j}:=\{\delta_t\in\Delta^\mathcal{D}_t\ \vert \ \delta_t\in I_j\}\]
+	We define the set of indices $\mathcal{D}^{\mathrm{ind},j}$ that partition the set $\Delta_\tau^\mathcal{D}$ in the indices from the mini batch which differences belong to the interval $I_j$ by
+	\[\mathcal{D}^{\mathrm{ind},j}:=\left\{(\pi(i),k,l)\ \vert\ \tau^{\pi(i)}_l - \tau^{\pi(i)}_k\in\Delta^\mathcal{D}_\tau\cap I_j\right\}\]
+	for $j=1,\ldots,\delta_\mathrm{mesh}$. 
+	The midpoint $\delta_\tau^{\mathcal{D},j}$ of the interval $I_j$ is for all $j=1,\ldots,\delta_\mathrm{mesh}$ defined by
+	\begin{align*}
+		\delta_\tau^{\mathcal{D},j} &:= \frac{1}{2}\left(\min\{\Delta^\mathcal{D}_\tau\} + (j-1)\frac{\max\{\Delta^\mathcal{D}_\tau\}- \min\{\Delta^\mathcal{D}_\tau\}}{\delta_\mathrm{mesh}} + \min\{\Delta^\mathcal{D}_\tau\} + j\frac{\max\{\Delta^\mathcal{D}_\tau\}- \min\{\Delta^\mathcal{D}_\tau\}}{\delta_\mathrm{mesh}}\right)\\
+		&= \min\{\Delta^\mathcal{D}_\tau\} + \left(j-\frac{1}{2}\right)\frac{\max\{\Delta^\mathcal{D}_\tau\}- \min\{\Delta^\mathcal{D}_\tau\}}{\delta_\mathrm{mesh}}.
+	\end{align*}
+	%We note that 
+	%\[\Delta_t^\mathcal{D}= \Delta^{\mathcal{D},1}_t \cup \cdots \cup %\Delta_{t}^{\mathcal{D},\delta_\mathrm{mesh}}\]
+	%holds. 
+	Next, given such a set of indices $\mathcal{D}^{\mathrm{ind},j}$ we want to sort the corresponding measurements dimensionally. That means we define for all dimensions $z_\mathrm{dim} = 1,\ldots, d$ and all $j=1,\ldots, \delta_\mathrm{mesh}$ the sets $Z^{z_\mathrm{dim},\mathcal{D},j}$ by
+	%\[Z^{z_\mathrm{dim},\mathcal{D},j}:=\left\{\left(Z_{z_\mathrm{dim},l}^{\pi(i)}, Z_{z_\mathrm{dim},k}^{\pi(i)}\right)\ \vert\ \tau_l^i - \tau_k^i\in\Delta_t^{\mathcal{D},j},\ 1\leq k<l\leq n_{\pi(i)},\ i=1,\ldots,n_\mathrm{batch}\right\},\]
+	\[Z^{z_\mathrm{dim},\mathcal{D},j}:=\left\{\left(Z_{z_\mathrm{dim},k}^{\pi(i)}, Z_{z_\mathrm{dim},l}^{\pi(i)}\right)\ \vert\ (\pi(i),k,l)\in \mathcal{D}^{\mathrm{ind},j}\right\},\]
+	where $Z_{z_\mathrm{dim},k}^{\pi(i)}$ and $Z_{z_\mathrm{dim},l}^{\pi(i)}$ are the entries of the matrix 
+	$Z^{\pi(i)}\in\mathcal{Z}$ which we get from the component-wise realization of the neural network $\Phi_\mathcal{M}$ from the matrix $M^{\pi(i)}\in\mathcal{M}$. We now want to partition the set $Z^{z_\mathrm{dim},\mathcal{D},j}$ into subsets sorted by the value of the first entry $Z_{z_\mathrm{dim},k}^{\pi(i)}$ of the tuples. For this purpose we denote the number of elements of $Z^{z_\mathrm{dim},\mathcal{D},j}$ by $n_{z_\mathrm{start}}\in\N$ which depends on $z_\mathrm{dim}$, $\mathcal{D}$ and $j$. With the partitions of the set $Z^{z_\mathrm{dim},\mathcal{D},j}$ we want to end up roughly with  $\sqrt[3]{n_{z_\mathrm{start}}}$ many subsets each with $\sqrt{n_{z_\mathrm{start}}}$ many elements. This does not add up exactly since $\sqrt[3]{n_{z_\mathrm{start}}}$ and $\sqrt{n_{z_\mathrm{start}}}$ are not necessarily natural numbers.
+	We obtain the subsets $Z^{z_\mathrm{dim},\mathcal{D},j,1},\ldots, Z^{z_\mathrm{dim},\mathcal{D},j,z_\mathrm{mesh}}$ for $z_\mathrm{mesh}\in\N$ by sorting the set $Z^{z_\mathrm{dim},\mathcal{D},j}$ according to the value of the first tuple entry such that in each of the subsets these values are approximately equal. According to this construction, the individual subsets contain all tuples with similar initial values, i.e. first tuple entries in each case. \\
+	Now, we have sorted our latent data on the one hand according to temporal differences and on the other hand according to the initial values as described at the beginning. So let us consider the average initial value $z_\mathrm{start}$, i.e. the average of the first tuple entries and the final values, i.e. the second tuple entries from one of the subsets $Z^{z_\mathrm{dim},\mathcal{D},j, k}$ for $z_\mathrm{dim}\in\{1,\ldots,d\}$, $j\in\{1,\ldots,\delta_\mathrm{mesh}\}$ and $k\in\{1,\ldots,z_\mathrm{mesh}\}$. The idea is that for an Ornstein-Uhlenbeck process with a given initial value, the final values come from a normal distribution. This is illustrated in figure \ref{Abb Empirische Verteilung}.\\
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width=0.6\textwidth]{Empirische_Verteilung}
+		\caption{Schematic representation of the normal distribution of an Ornstein-Uhlenbeck process.}
+		\label{Abb Empirische Verteilung}
+	\end{figure}
+	We now want to estimate the parameters of this normal distribution appropriately using the data, i.e. the final values. The arithmetic mean of the empirical data is recommended as an estimator for the expected value. According to example 2.62 \cite{Hammerstein2021}, this estimator is a uniformly mininum-variance unbiased (UMVU) estimator. The unbiased sample variance of the empirical data is a recommended estimator for the variance. This estimator is UMVU according to Example 2.62 \cite{Hammerstein2021}. For the $n_\mathrm{end}\in\N$ final values $z_\mathrm{ends} =z_1,\ldots, z_{n_\mathrm{end}}$ according to a subset $Z^{z_\mathrm{dim},\mathcal{D},j,k}$ 
+	the arithmetic mean is defined by
+	\[\overline{z_\mathrm{ends}}:= \frac{1}{n_\mathrm{end}}\sum_{l=1}^{n_\mathrm{end}}z_l\]
+	and the unbiased sample variance is defined by
+	\[S^2(z_\mathrm{ends}):= \frac{1}{n_\mathrm{end}-1}\sum_{l=1}^{n_\mathrm{end}}(z_l - \overline{z_\mathrm{ends}})^2.\]
+	We are now able to define the loss function. \\
+	The Fokker-Planck loss $L_\mathrm{FP}$ on a mini batch $\mathcal{D}$ corresponding to the neural network $\Phi_\mathcal{B}$ with parameters $\theta_\mathcal{B}$ is defined by
+	\[L_\mathrm{FP}(\theta_\mathcal{B}, B^i)=\sum_{j=1}^{\delta_\mathrm{mesh}}\sum_{z_\mathrm{dim} = 1}^d \sum_{k=1}^{z_\mathrm{mesh}} \left(M_{z_\mathrm{start}}(\delta_\tau^{\mathcal{D},j}, \varphi^i)-\overline{z_\mathrm{ends}}\right)^2 + \left(\omega(\delta_\tau^{\mathcal{D},j}, \varphi^i)- S^2(z_\mathrm{ends})\right)^2\]
+	for $i\in \{1,\ldots, N\}$. A schematic representation of the baseline network training can be found in figure \ref{Abb model FP part 2}.
+	
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width=1\textwidth]{Modell_Fokker-Planck_Part2}
+		\caption{Schematic representation of the baseline network training on a mini batch corresponding to the Fokker-Planck method.}
+		\label{Abb model FP part 2}
+	\end{figure}
+	
+	For $n_\mathrm{batches}\in\N$ sampled individuals $i_1,\ldots,i_{n_\mathrm{batches}}\in\{1,\ldots,N\}$ and corresponding mini batches $\mathcal{D}_1,\ldots,\mathcal{D}_{n_\mathrm{batches}}$ which are generated as described above we define the objective loss function $\mathcal{L}_\mathrm{FP}$ by
+	\[\mathcal{L}_\mathrm{FP}(\theta_\mathcal{B}):= \frac{1}{n_\mathrm{batches}}\sum_{j=1}^{n_\mathrm{batches}}L_\mathrm{FP}(\theta_\mathcal{B},B^{i_j}).\]
+	By sampling the individuals with which we generate our mini batches we get a kind of stochastic gradient descent. The training of this method can then be described by algorithm \ref{Algo Fokker Planck}.
+	
+	\clearpage
+	\begin{algorithm}
+		\caption{Fokker-Planck} \label{Algo Fokker Planck}
+		\textbf{Require:} dataset $\mathcal{X}$, learning rate $\eta$, ${\theta_\mathcal{B}}_0$, epochs, $n_{\mathrm{batches}}$, $\delta_\mathrm{mesh}$\\
+		$k,e\gets 0$\\
+		\While{$e< \mathrm{epochs}$}{
+			sample indivuals $i_1,\ldots, i_{n_\mathrm{batches}}\in\{1,\ldots,N\}$\\
+			generate mini batches $\mathcal{D}_1,\ldots,\mathcal{D}_{n_\mathrm{batches}}$ corresponding to the individuals\\
+			divide mini batches by temporal differences $\delta_\tau$\\
+			subdivide divided mini batches by initial values\\
+			\For{$n_{\mathrm{batch}} \mathrm{~in~} 1:n_{\mathrm{batches}}$}{
+				%$g \gets \nabla_\theta J(\theta)$\\
+				obtain $\delta_\tau$, $z_\mathrm{start}$, $\overline{z_\mathrm{ends}}$, $S^2(z_\mathrm{ends})$ from the mini batch $\mathcal{D}_{n_\mathrm{batch}}$
+				$\nabla \gets \mathrm{backprop}({\theta_\mathcal{B}}_k, L_\mathrm{FP}, \mathcal{D}_{n_{\mathrm{batch}}})$\\
+				${\theta_\mathcal{B}}_{k+1}\gets \mathrm{update}({\theta_\mathcal{B}}_k, \nabla, \eta)$\\
+				$k \gets k+1$
+			}
+			$e\gets e+1$
+		}
+	\end{algorithm}
+	
+
+
+	\newpage
+	\ 
+	\newpage
+	
+	
+	\section{Simulation Study} \label{Kap. Simulation study}
+	
+	In order to see how the performance of the methods developed in chapter \ref{sec methods} is we test them within a simulation study on a generated suitable data set. This data set primarily fits the setting described in section \ref{Methods:Setting}. Since this thesis is motivated by the application to medical data collected in the course of a study on a disease, such as the SMArtCARE data, the simulated data set is inspired by such real data. Participants in such studies have different characteristics that are important for the health status measured within the study. This means that they can be assigned to different groups. A simple classification is the distinction between a group consisting of participants who suffer from the disease and a group consisting of those who are healthy. In addition, the measured values of the participants show a temporal development over the individual measurement times. This development is individual for each participant. Within the above mentioned groups, however, the general temporal development of the measured values should be similar. Considering the SMArtCARE data set Considering the SMArtCARE data set it turns out that the assumption of an underlying Ornstein-Uhlenbeck process is suitable for such a development. Overall, we consider a simulated data set that is inspired by real data, but still designed to be simple enough such that weaknesses in the methods can be quickly identified.
+	
+	\subsection{Simulation Design}\label{sec simulation design}
+	
+	As a kind of extension of Hackenberg's work \cite{Hackenberg2022} on stochastic differential equations, the simulation design explained below was developed building on that one presented in her thesis.\\
+	The following general conditions apply to our generated simulation design. We have a total of $N=1000$ individuals. Each individual $i$ has $2\leq n_i\leq 10$ observations over time.  The study entry $\tau^i_1$ of every individual is sampled uniformly between $0$ and $\frac{1}{4}$, such that $\tau^i_1$ is sampled from $U([0,\frac{1}{4}])$. The individual observation times are then given by $0\leq\tau^i_1\leq\ldots\leq \tau^i_{n_i}\leq 1$. This means each individual has an individual study entry and an individual number of observation points at individual time points. Each measurement over time contains ten features, i.e. $D=10$. The values of the measurement series for each individual are given by different paths of different Ornstein-Uhlenbeck processes. In order to assign the individuals to different groups, the parameters of the Ornstein-Uhlenbeck processes differ in each group. We distinguish between two groups. The first group is meant to simulate those individuals, which are "healthy" and the second group those who are "sick". The individuals $i\in\{1,\ldots,N\}$ are randomly assigned to one of the groups, such that every group contains $\frac{N}{2}$ individuals. Each group is based on two different Ornstein-Uhlenbeck processes, i.e. two different tuples of parameters corresponding to these processes. The values of the first five features of the measurement series are described by paths of the first Ornstein-Uhlenbeck process and the values of the remaining five features are described by paths of the other one. The initial values and parameters of these processes can be taken from table \ref{Tabular group params}. The paths of these Ornstein-Uhlenbeck processes are approximated by the Euler-Maruyama method from Definition \ref{Def Euler-Maruyama method} at the given individual time points.\\
+	The process of simulating the set of series of measurements $\mathcal{M}$ is described by Algorithm \ref{Algo sim design measurements}. An example of the data from individuals of both groups can be found in figures \ref{Abb Dataplot group 1} and \ref{Abb Dataplot group 2}. The idea to generate the data with these parameters is that the measured values of healthy individuals evolve positively over time. The data of the sick individuals, on the other hand, partly shows a certain destructive development of the values over time. In addition, these are more stochastically influenced.
+	
+	\begin{algorithm}
+		\caption{Simulation of series of measurements} \label{Algo sim design measurements}
+		\textbf{Require:} $N\in 2\N$, $D\in 2\N$, components $x_0, \vartheta, \mu, \sigma$ from all OUP's\\
+		initialize random permutation $\pi:\{1,\ldots,N\}\to\{1,\ldots,N\}$\\
+		$\mathrm{group1} = \left\{\pi(1,\ldots,N)_k\ \vert \ k=1,\ldots,\frac{N}{2}\right\}$\\
+		$\mathrm{group2} = \left\{\pi(1,\ldots,N)_k\ \vert \ k=\frac{N}{2},\ldots,N\right\}$\\
+		\For{$i=1,\ldots,N$}{
+			sample $\tau^i_1$ from $U\left(\left[0,\frac{1}{4}\right]\right)$\\
+			sample $n_i$ from $U([2:10])$\\
+			sample $n_i -1$ values from $U([\tau^i_1,1])$\\
+			sort these values such that $\tau^i_2\leq\ldots\leq\tau^i_{n_i}$\\
+			$M^i = \mathrm{zeros}(D, n_i)$\\
+			\For{$j=1,\ldots,D$}{
+				\eIf{$j\leq \frac{D}{2}$}{
+					\eIf{$i\in \mathrm{group1}$}{
+						$x_0, \vartheta, \mu, \sigma \gets$ components first OUP group1\\
+					}{
+						$x_0, \vartheta, \mu, \sigma \gets$ components first OUP group2\\
+					}
+					$M^i[j,:] = \text{Eul-Mar}(x_0,\vartheta, \mu,\sigma,\tau^i_1\ldots,\tau^i_{n_i})$\\
+				}{
+					\eIf{$i\in \mathrm{group1}$}{
+						$x_0, \vartheta, \mu, \sigma \gets$ components second OUP group1\\
+					}{
+						$x_0, \vartheta, \mu, \sigma \gets$ components second OUP group2\\
+					}
+					$M^i[j,:] = \text{Eul-Mar}(x_0,\vartheta, \mu,\sigma,\tau^i_1\ldots,\tau^i_{n_i})$\\
+				}
+			}
+		}
+		\KwResult{$\mathcal{M}=\{M^1,\ldots,M^N\}$}
+	\end{algorithm}
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{|c|c||c||c|c|c|}
+			\cline{3-6}
+			\multicolumn{2}{c}{} \vline & Initial value & \multicolumn{3}{c}{Parameters} \vline\\
+			\cline{3-6}
+			\multicolumn{2}{c}{} \vline & $x_0$ & $\vartheta$ & $\mu$ & $\sigma$\\
+			\hhline{~~====}
+			\cline{1-2}
+			Group 1 & first OUP & 0 & 5 & 3 & 0.5\\
+			\cline{2-6}
+			"healthy" individuals & second OUP & 0 & 5 & 1 & 0.5\\
+			\hline
+			\hline
+			Group 2 & first OUP & 0 & 3 & 3 & 1\\
+			\cline{2-6}
+			"sick" individuals & second OUP & 0 & 3 & -1 & 1\\
+			\hline
+		\end{tabular}
+		\caption{The initial values and parameters corresponding to the Ornstein-Uhlenbeck processes (OUP) of the different groups.\protect\footnotemark}
+		\label{Tabular group params}
+	\end{table}
+	\footnotetext{The notation from this table is adapted to the notation of the one-dimensional Ornstein-Uhlenbeck process from Definition \ref{Def 1dim OUP}.}
+	
+	%\hspace{-0.005\textwidth}
+	\begin{figure}[!h]
+		\makebox[1\textwidth]{
+			\begin{minipage}[m]{0.495\textwidth}
+				\includegraphics[width=1\textwidth]{Dataplot_group1_new}
+				\caption{Data series of an individual from group 1 (healthy individuals).}
+				\label{Abb Dataplot group 1}
+			\end{minipage}
+			\hspace{0.01\textwidth}
+			\begin{minipage}[m]{0.495\textwidth}
+				\includegraphics[width=1\textwidth]{Dataplot_group2_new}
+				\caption{Data series of an individual from group 2 (sick individuals).}
+				\label{Abb Dataplot group 2}
+			\end{minipage}
+		}
+	\end{figure}
+	
+	%First, we divide the parameters into two different groups as described above. The latent state %is as a two-dimensional process describing the stochastic initial value problem as in equation %\ref{SDE OUP}. Let us first assume that the matrix $\Sigma^i$ is a diagonal matrix whose %diagonal entries do not vanish. As described in section \ref{sec_Background}, the solution of %the two component-wise initial value problems, as in equation \ref{compwise init val prob}, is %then a one-dimensional Ornstein-Uhlenbeck process. The parameters of the two groups and the %component-wise Ornstein-Uhlenbeck processes are shown in the following table.
+	%\footnote{The parameters $\Sigma^i$, $\mu^i$ and $\boldsymbol{\sigma}^i$ results from 
+	%	$\Sigma^i_{jj} = -\vartheta$, $\mu^i_j = \vartheta \mu$ and $\boldsymbol{\sigma}^i_{jj}=\sigma$.}
+	%\begin{center}
+	%	\begin{tabular}{|c|c||c||c c|c|c c||c|c|c|}
+	%		\hline
+	%		&Parameters & $Z_0^i$ & $\Sigma^i$ & & $\mu^i$ & $\boldsymbol{\sigma}^i$ & & %$\vartheta$ & $\mu$ & $\sigma$\\
+	%		\hline \hline
+	%		Group 1 & SDE first component & 0 & -5 & 0 & 15 & 0.5 & 0 &  5 & 3 & 0.5\\
+	%		&SDE second component & 0 & 0 & -5 & 5 & 0 & 0.5 & 5 & 1 & 0.5\\
+	%		\hline
+	%		\hline
+	%		Group 2 & SDE first component & 0 & -3 & 0 & 9 & 1 & 0 & 3 & 3 & 1\\
+	%		&SDE second component & 0 & 0 & -3 & -3 & 0 & 1 & 3 & -1 & 1\\
+	%		\hline
+	%	\end{tabular}
+	%\end{center}
+
+	
+
+	%With the help of these processes we can now generate the data set. We have a total of 
+	%$N=1000$ individuals. These can then be randomly divided into two groups, so that in the end %one half of the individuals belong to group 1 and the other half to group 2. Each individual %has $n_i\leq 10$ observation times, where at each observation time $D=10$
+	%many observations are measured. The first half of these observations consist of realizations %of the SDE of the first component of the respective group to which the individual belongs and %the second half of realizations of the SDE of the second component. 
+	%Disease data on patients in the medical field will not usually be undertaken from birth. The %start time of a study represents a different time in the disease course for each patient. %Therefore, we randomly draw the study entry as the first measurement time point for each %patient. Since patient data prior to study entry are unknown in the real case, the model only %knows the data from study entry and can model them appropriately.
+	%\\
+	Further, we have a look at the baseline variables. These contain the specific characteristics of each individual. Each baseline vector contains $50$ features, i.e. $n_\mathcal{B}=50$. There are two variants to simulate these variables. The first variant is to distinguish between individuals of the first and the second group. The idea is to fill the baseline vectors, up to a certain value, with the noisy information about the associated group of the individual. The remaining entries are then filled with noise values that cannot be clearly delineated between the groups. For any individual from the first group (group of "healthy" individuals), the first $\mathcal{B}_\mathrm{info}$ entries (where $\mathcal{B}_\mathrm{info}\in\N$ with $\mathcal{B}_\mathrm{info}\leq n_\mathcal{B}$) of the vector correspond to realizations of an $\mathcal{N}(1,\sigma_\mathrm{info})$ distributed random variable, where $\sigma_\mathrm{info}>0$. The remaining entries are then realizations of an $\mathcal{N}(0,\sigma_\mathrm{noise})$ distributed random variable with $\sigma_{\mathrm{noise}}>0$. For an individual from the second group, the first $\mathcal{B}_\mathrm{info}$ entries of the vector correspond to realizations of an $\mathcal{N}(-1,\sigma_\mathrm{info})$ distributed random variable and the remaining $\mathcal{B}_\mathrm{info}$ entries correspond to realizations of an $\mathcal{N}(0,\sigma_\mathrm{noise})$ distributed random variable. \\
+	In the second variant, the baseline variables contain noisy information about the parameters of the Ornstein-Uhlenbeck processes. When filling the baseline vectors, the same procedure is used as in the previously described variant. The number $\mathcal{B}_\mathrm{info}$ is a multiple of the number of parameters of the processes. Since the data from each group is generated using two different Ornstein-Uhlenbeck processes, a total of six parameters are given, i.e. $\mathcal{B}_\mathrm{info}\in 6\N$ with $\mathcal{B}_\mathrm{info}\leq n_\mathcal{B}$. \\
+	The process of simulating the baseline variables using the first variant can be described by algorithm \ref{algo-simulation-baseline-groupinfo}. The simulation method using the second variant can be described by algorithm \ref{algo-simulation-baseline-trueOUPparams}.
+	
+	\begin{algorithm}
+		\caption{Simulation of baseline variables with group membership}
+		\label{algo-simulation-baseline-groupinfo}
+		\textbf{Require:} $n_\mathcal{B}\in 2\N$, $\mathcal{B}_{\mathrm{info}}\in\N_{\leq n_\mathcal{B}}$, $~\sigma_{\mathrm{info}}, \sigma_{\mathrm{noise}}>0$\\
+		\For{$i=1,\ldots,N$}{
+			$B^i = \mathrm{zeros}(n_\mathcal{B})$\\
+			\For{$j=1,\ldots, \mathcal{B}_\mathrm{info}$}{
+				\eIf{$i\in \mathrm{group1}$}{
+					sample $B^i_j$ from $\mathcal{N}(1,\sigma_{\mathrm{info}})$\\
+				}{
+					sample $B^i_j$ from $\mathcal{N}(-1,\sigma_{\mathrm{info}})$\\
+				}
+			}
+			\For{$j=(\mathcal{B}_\mathrm{info} +1),\ldots,n_\mathcal{B}$}{
+				sample $B^i_j$ from $\mathcal{N}(0,\sigma_{\mathrm{noise}})$\\
+			}
+		}
+		\KwResult{Baseline variables $\mathcal{B}=\{B^1,\ldots,B^N\}$}
+	\end{algorithm}
+	
+	\begin{algorithm}
+		\caption{Simulation of baseline variables with true OUP parameters}
+		\label{algo-simulation-baseline-trueOUPparams}
+		\textbf{Require:} $n_\mathcal{B}\in 2\N$, $\mathcal{B}_{\mathrm{info}}\in 6\N$, $\mathcal{B}_\mathrm{info}\leq n_\mathcal{B}$, $~\sigma_{\mathrm{info}}, \sigma_{\mathrm{noise}}>0$\\
+		\For{$i=1,\ldots,N$}{
+			%get params from both OUP's of group1\\
+			get $6$ params from OUP's of the group in which $i$ is containted\\
+			$\varphi \gets \mathrm{OUPparams}_{\mathrm{group}_i}$\\% (\vartheta_1, \mu_1, \sigma_1, \vartheta_2, \mu_2, \sigma_2)$\\
+			$B^i = \mathrm{zeros}(n_\mathcal{B})$\\
+			\For{$j=0,\ldots, (\mathcal{B}_\mathrm{info}-1)$}{
+				sample $B^i_j$ from $\mathcal{N}(\varphi[(j~\mathrm{mod}~ 6)+1],\sigma_{\mathrm{info}})$\\
+			}
+			\For{$j=(\mathcal{B}_\mathrm{info} +1),\ldots,n_\mathcal{B}$}{
+				sample $B^i_j$ from $\mathcal{N}(0,\sigma_{\mathrm{noise}})$\\
+			}
+			
+		}
+		\KwResult{Baseline variables $\mathcal{B}=\{B^1,\ldots,B^N\}$}
+	\end{algorithm}
+
+	\clearpage
+	
+	\subsection{Results}
+	
+	In this section we will have a look at the results of our methods from section \ref{sec methods} using the simulation design described in section \ref{sec simulation design}. 
+	We will encounter various problems. The aim of the methods is to suitably determine the temporal evolution underlying the data. This means to learn the parameters of the Ornstein-Uhlenbeck process. We will see that the drift parameters can be learned well by using the developed methods. The learning of the stochasticity, i.e. the diffusion parameters, on the other hand, turns out to be much more difficult. 
+	We will first look at some implementation details and then examine the results of each method.
+	
+	\subsubsection{Implementation Details}
+	
+	The developed methods were implemented in the Julia programming language of version 1.7.0 with the additional packages DataFrames.jl (v1.3.2), Flux.jl (v0.12.9), JLD2.jl (v0. 4.22), LaTeXStrings.jl (v1.3.0), StatsBase.jl (v0.33.21), Plots.jl (v1.35.0), Distributions.jl (v0.25.75), Distributed.jl and Random.jl. The exact architecture of the networks can be seen in the following table. As an optimizer during the training the ADAM optimizer \cite{Kingma2014Adam} was used. The programming is loosely based on the work of Maren Hackenberg \cite{Hackenberg2022}.
+
+	\begin{table}[htb]
+		\begin{center}
+			\begin{tabular}{llccc}
+				\toprule
+				\toprule
+				\textbf{\ }	&\textbf{Encoder}	&\textbf{Outputsize} &\textbf{Parameters}  &\textbf{Activation Function}\\
+				\midrule
+				\textbf{1.}	&Input-Layer	& 10		& 0		&- \\
+				\textbf{2.}	&Dense-Layer	& 10		& 110	&tanh \\
+				\textbf{3.}	&Dense-Layer	& 2			& 22	&- \\
+				\bottomrule
+				\toprule
+				\textbf{\ }	&\textbf{Decoder}	&\textbf{Outputsize} &\textbf{Parameters} &\textbf{Activation Function}\\
+				\midrule
+				\textbf{1.}	&Input-Layer	& 2		& 0		&- \\
+				\textbf{2.}	&Dense-Layer 	& 10	& 22	&tanh \\
+				\textbf{3.}	&Dense-Layer	& 10	& 110	&- \\
+				\bottomrule
+				\toprule
+				\textbf{\ }	&\textbf{Baseline Network}	&\textbf{Outputsize} &\textbf{Parameters} &\textbf{Activation Function}\\
+				\midrule
+				\textbf{1.}	&Input-Layer	& 50		& 0		&- \\
+				\textbf{2.}	&Dense-Layer	& 50		& 2550	&tanh \\
+				\textbf{3.}	&Dense-Layer	& 50		& 2550	&tanh \\
+				\textbf{4.}	&Dense-Layer	& 2+2+2		& 306	& $3\mathrm{tanh}+1$ \\
+				\textbf{5.}	&Diagonal-Layer	& 6			& 0		&- \\
+				\bottomrule
+				\bottomrule
+				
+			\end{tabular}
+		\end{center}
+	\end{table}
+	
+	\subsubsection{Method: Euler-Maruyama}
+
+	We first look at some results using the Euler-Maruyama method from Section \ref{sec Eul Mar}. The idea is to approximate the latent process using the Euler-Maruyama method. Images of individual data series with their associated reconstructions, encoded and latent states can be found in Figures \ref{Res:Method EulMar Group1} and \ref{Res:Method EulMar Group2}.
+	
+	\begin{figure}[!h]
+		\includegraphics[width=\textwidth]{EulerMar_plot_group1_new}
+		\includegraphics[width=\textwidth]{EulerMar_plot_group1_unlabeled_new}
+		\caption{Data series with corresponding reconstruction, encoded and latent states of two individuals assigned to group one (healthy group) using the Euler-Maruyama method.} \label{Res:Method EulMar Group1}
+	\end{figure}
+	
+	\begin{figure}[!h]
+		\includegraphics[width=\textwidth]{EulerMar_plot_group2_new}
+		\includegraphics[width=\textwidth]{EulerMar_plot_group2_unlabeled_new}
+		\caption{Data series with corresponding reconstruction, encoded and latent states of two individuals assigned to group two (sick group) using the Euler-Maruyama method.} \label{Res:Method EulMar Group2}
+	\end{figure}
+
+	We note here that the reconstructions initially look promising, but do not exhibit any stochasticity, i.e. $\sigma$ was learned to be equal to zero. This can be explained by the fact that the model is only trained by the reconstruction loss of the column-wise reconstruction of the data. Adding stochasticity to the latent state by the Euler-Maruyama method increases the reconstruction loss. This is what the model tries to avoid and it learns $\sigma=0$ to keep the error as minimal as possible. Another problem is that the reconstructed latent data series is constant and thus the parameters that are supposed to indicate the drift of the latent process have not been learned correctly. The assumption that the reconstructed latent data series is equal to the encoded data series is not satisfied. Moreover, the latent reconstruction depends only on the state of the first encoded data point. To determine the parameters of the process it would be better to use the whole encoded data series.\\
+	Considering the latent space more precisely we see that the encoded states already do not have any stochasticity included. This means that already the encoder smoothes the original data in such a way that these do not exhibit stochasticity anymore. The structure of the data, which was generated by paths of the Ornstein-Uhlenbeck processes, does not remain in the encoded data. Accordingly, both drift and diffusion parameters of the processes of the latent data are not learned. On the other hand, it should be mentioned that the model is able to distinguish between individuals of the two groups.\\
+	In summary, this method has two major difficulties. First, the structure of the data is not preserved by encoding, which means that neither drift nor diffusion can be learned properly. Second, the model avoids adding stochasticity to minimize the loss. \\
+	The idea is now to independently train the autoencoder network and the baseline network by using different loss functions. This preserves the structure of the data during encoding and the parameters of the latent process can then be learned appropriately. A loss term that specifically considers the stochasticity based on the whole encoded data series is added to learn it in a suitable way such that $\sigma$ is unequal to zero.
+	\clearpage
+	
+	\subsubsection{Method: Covariance Loss}\label{sec res cov los}
+	
+	This section focuses on the results obtained using the covariance loss method from section \ref{sec cov loss}. One problem that arose using this method was that the stochasticity was again learned to be equal to zero. During the application of this method, it turned out that for our setting the training of the model in two steps is suitable. That means the training of the autoencoder based on the data is first performed using a simple reconstruction loss, and afterwards the baseline network is trained by using the \textsl{general covariance loss}. Therefore, the parameters of the latent process can be learned. This \textsl{simple reconstruction loss} is defined by
+	\begin{align*}
+		L_\mathrm{srec}(\theta_{\mathrm{AE}}, M^i)&=\sum_{j=1}^{n_i}\abs{\abs{M^i_j - \hat{M}^i_j}}_2^2\\
+		&= \sum_{j=1}^{n_i}\abs{\abs{M^i_j - R(\Phi_{\mathrm{AE}})(M^i_j)}}_2^2
+	\end{align*}
+	for all $M^i\in\mathcal{M}$. We preserve the structure of the data by using this loss first and then study the latent space. For the weights of the \textsl{general covariance loss} in the second step it turned out that in our setting $\alpha_\mathrm{latrec}=10$ and $\alpha_\mathrm{cov}=100$ is a good choice. That means the \textsl{general covariance loss} is represented by
+	\[L_\mathrm{CL}(\theta_\mathrm{CL}, (M^i, B^i)) = L_\mathrm{rec}(\theta_{\mathrm{AE}}, M^i) + 10 L_\mathrm{latrec}(\theta_\mathcal{B}, Z^i) + 100L_\mathrm{cov}(\theta_\mathcal{B}, B^i).\]
+	Moreover, during the application of the method, it has been found that the gradient descent algorithm \ref{Gradient Descent} is suitable for the training in the first step and the stochastic gradient descent algorithm \ref{Stochastic Gradient Descent} is suitable for the training in the second step. 
+	Some images of individual data series with their associated reconstructions, encoded and latent states can be found in figures \ref{Res:Method Covloss Group1} and \ref{Res:Method Covloss Group2}. 
+	To represent the learned stochasticity, the noise was added to each of the reconstructions sized by the encoded stochasticity $\sigma$. This only serves to represent the size of $\sigma$ and is not intended to reflect the reconstruction of the data. The important part of this representation of the reconstructed data is the learned drift. 
+	We see that some of the problems that we had observed using the Euler-Maruyama method are at least no longer present to the same extent. On the one hand, if we consider the encoded data, we see that there is stochasticity and that the data is showing a trend. On the other hand, the latent reconstructed data corresponds to the encoded data. Furthermore, it can be seen that $\sigma$ was not learned equal to zero. Although the model has learned stochasticity equal to zero in one of the components of group one, this is not evident in the others. In addition, the model is able to distinguish between individuals of both groups.
+	
+	\begin{figure}[!h]
+		\includegraphics[width=\textwidth]{Euler_plot_group1_new}
+		\includegraphics[width=\textwidth]{Euler_plot_group1_unlabeled_new}
+		\caption{Data series with corresponding reconstruction and, encoded and latent states of two individuals assigned to group one (healthy group) using the covariance loss method.} \label{Res:Method Covloss Group1}
+	\end{figure}
+	
+	\begin{figure}[!h]
+		\includegraphics[width=\textwidth]{Euler_plot_group2_new}
+		\includegraphics[width=\textwidth]{Euler_plot_group2_unlabeled_new}
+		\caption{Data series with corresponding reconstruction, encoded and latent states of two individuals assigned to group two (sick group) using the covariance loss method.} \label{Res:Method Covloss Group2}
+	\end{figure}
+	
+	\clearpage
+	\subsubsection{Method: Fokker-Planck}
+	
+	In this section we consider the Fokker-Planck method developed in section \ref{sec Method Fokker-Planck}. The idea of this method is to estimate the parameters of the Ornstein-Uhlenbeck process associated with the process underlying the encoded data. In applying this method, the data is first centered. This means that from all measured values and all baseline variables, the mean value of each is subtracted from the data, thus centering the data around zero. Since results from the covariance loss method \ref{sec res cov los} have already shown that the reconstruction loss in the first step is suitable to preserve the structure of the data during encoding, we focus on the latent space. We want to take advantage of the fact that the learned Ornstein-Uhlenbeck process can be represented by a probability density function. The probability density function in the latent space with the learned parameters of some individuals is represented in figures \ref{Res:Method FP Group1} and \ref{Res:Method FP Group2}. We want to represent this function by the expected value and the 95\% confidence interval at all time points given the study entry as the initial value. Since the latent process is normally distributed one gets an impression of the learned distribution. An advantage of this method is that this representation allows continuous extrapolation from each of the individual time points with given encoded value as initial value. Considering the figures, it can be observed that the expected value matches the data fairly closely in each dimension. The stochasticity of the data is also well established. We see that only the stochasticity of the second component of group two was learned a little too low. Also, we see that especially individuals with few observation points benefit from similar individuals with many observations. Further, we see that the group assignment of the individuals was also learned. This is demonstrated in Figure \ref{Res:Method FP Parameters} in more detail. The baseline variables of all individuals were realized and displayed with the baseline network.
+	
+	\begin{figure}[!h]
+		\begin{minipage}[m]{\textwidth}
+			\includegraphics[width=\textwidth]{Fokker-Planck_plot_group1_new}
+		\end{minipage}
+		\begin{minipage}[m]{\textwidth}
+			\includegraphics[width=0.5\textwidth]{Fokker-Planck_plot_group1_unlabeled_ind8_new}
+			\includegraphics[width=0.5\textwidth]{Fokker-Planck_plot_group1_unlabeled_ind9_new}
+		\end{minipage}
+		\begin{minipage}[m]{\textwidth}
+			\includegraphics[width=0.5\textwidth]{Fokker-Planck_plot_group1_unlabeled_ind21_new}
+			\includegraphics[width=0.5\textwidth]{Fokker-Planck_plot_group1_unlabeled_ind44_new}
+		\end{minipage}
+		\caption{Latent probability density functions represented by the expected value and the 95\% confidence interval at each time point given the study entry as initial value of some individuals assigned to group one (healthy group) using the Fokker-Planck method.}\label{Res:Method FP Group1}
+	\end{figure}
+
+	\begin{figure}[!h]
+		\begin{minipage}[m]{\textwidth}
+			\includegraphics[width=\textwidth]{Fokker-Planck_plot_group2_new}
+		\end{minipage}
+		\begin{minipage}[m]{\textwidth}
+			\includegraphics[width=0.5\textwidth]{Fokker-Planck_plot_group2_unlabeled_ind13_new}
+			\includegraphics[width=0.5\textwidth]{Fokker-Planck_plot_group2_unlabeled_ind30_new}
+		\end{minipage}
+		\begin{minipage}[m]{\textwidth}
+			\includegraphics[width=0.5\textwidth]{Fokker-Planck_plot_group2_unlabeled_ind10_new}
+			\includegraphics[width=0.5\textwidth]{Fokker-Planck_plot_group2_unlabeled_ind38_new}
+		\end{minipage}
+		\caption{Latent probability density functions represented by the expected value and the 95\% confidence interval at each time point given the study entry as initial value of some individuals assigned to group two (sick group) using the Fokker-Planck method.}\label{Res:Method FP Group2}
+	\end{figure}
+	\newpage
+	
+	\begin{figure}[!h]
+		\centering
+		\includegraphics[width=0.9\textwidth]{Parameter_plot_new}
+		\caption{Representation of the learned parameters realized by the baseline network of all individual baseline variables using the Fokker-Planck method. The model learns the group structure of the data implicitly.}\label{Res:Method FP Parameters}
+	\end{figure}
+	
+	\clearpage
+
+	\section*{Discussion}
+	\addcontentsline{toc}{section}{Discussion}
+	
+	In this thesis temporal data motivated by clinical data on a disease was analyzed. These data exhibit some stochasticity and have an individual number of observation points at individual times. It was also assumed that the data has a latent evolution over time. This evolution can be described by a stochastic differential equation. In addition, individual baseline variables are given to parameterize this differential equation. The data is subject to a certain group structure, which is not known and has to be learned additionally. Within this thesis a simulation design was generated motivated by the data of the SMArtCARE database. The solution of the stochastic differential equation is an Ornstein-Uhlenbeck process. Three different methods were introduced and tested on the simulation design. These methods were developed in chronological order and each of the subsequent methods benefited from the experience gained from the mistakes of the previous ones. The Euler-Maruyama method approximates the underlying process by using the Euler-Maruyama method in the latent space. The covariance loss method is designed to preserve the structure of the data and to learn the drift and diffusion parameters of the latent process through various loss functions. In the Fokker-Planck method, the empirical distribution given by the data is learned by subdividing the data. A major difficulty was to learn the diffusion term that reflects the stochasticity of the data. Also, it had to be taken into account that the individuals are assigned to different groups, which should be learned implicitly using the baseline variables. The goal was to assign each individual to one of the implicitly learned groups on the basis of the baseline variables, in order to then be able to predict the individual development of the data. This should be applicable even if there are only very few observations of some individuals. The methods applied to the simulation design offer promising results. The Fokker-Planck method was also applied to the SMArtCARE data. The results are demonstrated in figure \ref{Res: FP SMA}.
+	
+	\begin{figure}[!h]
+		\begin{minipage}[m]{\textwidth}
+			\includegraphics[width=\textwidth]{SMA_new}
+		\end{minipage}
+		\begin{minipage}[m]{\textwidth}
+			\includegraphics[width=0.5\textwidth]{SMA_1_new}
+			\includegraphics[width=0.5\textwidth]{SMA_2_new}
+		\end{minipage}
+		\begin{minipage}[m]{\textwidth}
+			\includegraphics[width=0.5\textwidth]{SMA_3_new}
+			\includegraphics[width=0.5\textwidth]{SMA_4_new}
+		\end{minipage}
+		\caption{Application of the Fokker-Planck method to the SMArtCARE data.}
+		\label{Res: FP SMA}
+	\end{figure}
+	
+	The Fokker-Planck method nevertheless offers potential for improvement in future research. The parameters of the process can be estimated from the empirical distribution of the data within the sampled mini batches by a maximum likelihood estimator.\\
+	Furthermore, only the situation was considered in which the stochastic differential equation underlying the data is an Ornstein-Uhlenbeck process. The methods for analyzing such data could also be generalized to a bigger class of stochastic differential equations. For this purpose, a suitable method for calibration has to be chosen for a given process class.
+	
+	%Deutsche Zusammenfassung
+	%In dieser Arbeit wurden zeitliche Daten analysiert, die motiviert an klinischen Daten zu einer Krankheit sind. Diese Daten weisen gewisse Stochastizität auf und haben individuell viele Beobachtungspunkte zu individuellen Zeiten. Es wurde außerdem angenommen, dass die Daten über die Zeit hinweg eine latente Entwicklung haben. Diese Entwicklung lässt sich durch eine stochastische Differentialgleichung beschreiben. Zusätzlich sind individuelle Baseline variablen gegeben mittels derer sich diese Differentialgleichung parametrisieren lässt. Die Daten unterliegen einer gewissen Gruppenstruktur, die nicht bekannt ist und zusätzlich erlernt werden soll. Innerhalb dieser Thesis wurde ein Simulationsdesign erstellt motiviert an den Daten der SMArtCARE Datenbank. Bei der Lösung der stochastischen Differentialgleichung handelt sich um einen Ornstein-Uhlenbeck Prozess. Es wurden drei verschiedene Methoden vorgestellt, die auf dem Simulationsdesign getestet wurden. Diese Methoden entstanden in chronologischer Reihenfolge und die nachfolgenden Methoden profitierten jeweils von dem aus den Fehlern voriger Methoden Gelernten. Die Euler-Maruyama Methode approximiert mittels des Euler-Maruyama Verfahrens im latenten Raum den zugrundliegenden Prozess. Die Kovarianz Verlust Methode soll zum einen die Struktur der Daten erhalten und zu anderen durch verschiedene Verlustftfunktionen die Drift und Diffusionsaparameter des latenten Prozesses erlernen. Bei der Fokker-Planck Methode wird die durch die Daten gegebene empirische Verteilung durch eine Unterteilung dieser erlernt. Eine große Schwierigkeit war es den Diffusionsterm der die Stochastizität der Daten wiedergibt geeignet zu erlernen. Auch musste mit berücksichtigt werden, dass sich die Individuen verschiedene Gruppen zugehörig sind, die anhand der Baseline Variablen implizit erlernt werden sollten. Das Ziel war es anhand der Baseline Variablen jedes Individuum einer der implizit erlernten Gruppen zuzuordnen, um dann die individuelle Entwicklung der Daten vorhersagen zu können. Schlussendlich sollen sich die Methoden auch dann anwenden lassen auch wenn teilweise nur sehr wenige Beobachtungen einiger Individuen vorhanden sind. Die Methoden die angewendet wurden bieten vielversprechende Resultate angewendet auf dem Simulations Design. Die Fokker-Planck Methode wurde auch auf die SMArtCARE Daten angewandt. Die Resultate dazu können Abbildung 5 entnommen werden.
+	%Die Fokker-Planck Methode bietet dennoch Potenzial zur Verbesserung für zukünftige Untersuchen. Die zu lernenden Parameter des Prozesses lassen sich anhand der empirische Verteilung der Daten innerhalb der gezogenen mini batches durch einen Maximum Likelihood Schätzer schätzen.
+	%Außerdem wurde nur der Fall betrachet, dass die stochastische Differentialgleichung die den Daten unterliegt ein Ornstein-Uhlenbeck Prozess ist. Man könnte die Methoden zur Analyse solcher Daten auch auf generelle stochastische Differentialgleichung verallgemeinern. Hierzu muss bei gegebener Prozessklasse eine geeignete Methode zum Kalibrieren gewählt werden.
+ 	
+ 	
+	\clearpage
+	\bibliographystyle{alpha}
+	\bibliography{MeineBib}
+	\addcontentsline{toc}{section}{References}
+	
+	\clearpage
+	\section*{Zusammenfassung in deutscher Sprache}
+	\addcontentsline{toc}{section}{Zusammenfassung in deutscher Sprache}
+	
+	Medizinische Zeitreihendaten wie die Daten zu klinischen Kohortenstudien enthalten oftmals gewisse Stochastizität. Eine Berücksichtigung dieser Stochastizität kann bei der Analyse solcher Daten also von großem Nutzen sein. Das Untersuchen von Daten, die individuelle latente Entwicklungsmuster aufweisen, wird zudem durch die oft sehr unregelmäßige Zeitstruktur der Daten erschwert. Ein Beispiel für solche Daten ist der Datensatz SMArtCARE, der Beobachtungen über die motorischen Fähigkeiten von StudienteilnehmerInnen beinhaltet, die an spinaler Muskelatrophie leiden. Die Daten zeigen, dass PatientenInnen, bei denen diese Krankheit diagnostiziert wird, ihre motorischen Fähigkeiten nicht mehr weiterentwickeln und sogar zurück entwickeln. Weiterhin stellt sich heraus, dass die Daten  individuelle latente Entwicklungsmuster aufweisen, die durch gewisse Stochastizität beeinflusst wird. Außerdem sind innerhalb des Datensatzes die Messwerte der Teilnehmenden nur zu individuellen Zeitpunkten mit individueller Frequenz vorhanden. Dabei lassen sich die einzelnen PatientenInnen basierend auf ihrem Alter und der Schwere der Krankheitssymptome in unterschiedliche Gruppen einteilen.\\
+	Diese Arbeit ist motiviert durch die Analyse von Daten wie jenen aus SMArtCARE. Das Ziel dieser Analyse ist sowohl das Ermitteln der den Daten zugrundeliegenden individuellen Entwicklungsmuster unter Berücksichtigung der enthaltenen Stochastizität als auch das implizite Erlernen der Gruppenstruktur. Um diese Gruppenstruktur zu erlernen, werden die zusätzlich gegebenen Baseline-Variablen verwendet, mit denen auch die individuellen Entwicklungen charakterisiert werden sollen. Da medizinische Datensätze oftmals sehr groß sind, bieten sich Methoden zur Dimensionsreduktion der Daten des maschinellen Lernens wie der Autoencoder an. Dadurch wird eine niedrigerdimensionale latente Darstellung der Daten gewonnen, welche mit geringerem Aufwand analysiert werden kann. Es hat sich zudem gezeigt, dass es bei der Analyse von Daten, die latente Entwicklungsmuster aufweisen, hilfreich ist anzunehmen, dass den Daten ein dynamisches System zugrundeliegt, das durch eine gewöhnliche Differentialgleichung beschrieben werden kann. Dieses dynamische System soll in dieser Arbeit aufgrund der in den Daten enthaltenen Stochastizität durch eine stochastische Differentialgleichung beschrieben werden. Der Fokus dieser Arbeit liegt dabei speziell auf Ornstein-Uhlenbeck-Prozessen.\\
+	In dieser Arbeit werden drei Methoden zur Analyse der oben beschriebenen Daten entwickelt und getestet. Diese Methoden wurden chronologisch entwickelt und nachfolgende Methoden bauen auf dem Wissen der Vorigen auf. Das Ziel der Euler-Maruyama-Methode ist, den latenten zugrundeliegenden Prozess mittels des Euler-Maruyama-Verfahrens zu approximieren. Die Kovarianz-Verlust-Methode verteilt das Erlernen der Drift- und Diffusionsparameter des Prozesses auf unterschiedliche Verlustfunktionen auf. Die Fokker-Planck-Methode nutzt Eigenschaften des den Daten zugrundeliegenden Ornstein-Uhlenbeck-Prozesses aus, um die Parameter des Prozesses anhand der empirischen Verteilung der Daten zu erlernen. Die Methoden werden auf einem generierten Simulationsdatensatz getestet. Dieser ist inspiriert durch  SMArtCARE und ist möglichst einfach gehalten, um Stärken und Schwächen der Methoden schnell ausmachen zu können.\\
+	Die Ergebnisse der Methoden führen bei der Anwendung auf diesen simulierten Datensatz zu vielversprechenden Resultaten. Die Methoden bieten gute Rekonstruktionen und auch die Entwicklungsmuster der Daten wurden entsprechend erlernt. Auch die zugrundeliegende Gruppenstruktur wurde bei der Anwendung aller Methoden erlernt. Es hat sich jedoch herausgestellt, dass vor allem das Ermitteln der Stochastizität der Daten die größte Schwierigkeit ist. Die Methoden zielen daher zunehmend darauf ab diese zu lernen und sind auch in der Lage dazu.\\
+	Zusätzlich wurden die Methoden auf den Datensatz SMArtCARE angewandt.\\
+	Insgesamt bieten die Methoden auch weiterhin Bedarf zur Weiterentwicklung. So würde es sich bei der Fokker-Planck Methode anbieten die Parameter des Ornstein-Uhlenbeck-Prozesses innerhalb der Einteilung der Daten durch einen Maximum-Likelihood-Schätzer zu ermitteln. Außerdem wurde die Annahme des dynamischen Systems auf Ornstein-Uhlenbeck-Prozesse beschränkt. Hier würden sich Methoden anbieten, die auch auf größere Prozessklassen angewandt werden können.
+	
+	
+	%In klinischen Kohortenstudien in denen Krankheiten untersucht werden und welche den Gesundheitszustand der Studienteilnehmer erfassen und auswerten sollen, werden typischerweise an unterschiedlichen Zeitpunkten Messwerte der Teilnehmer ermittelt. Diese weisen je nach Krankheitszustand gewisse latente Entwicklungsmuster über die Zeit auf. Wir nehmen an, dass sich diese Entwicklung durch einen Ornstein-Uhlenbeck Prozess beschreiben lässt. Lässt sich dieser Prozess parametrisieren, so können Vorhersagen über den zukünftigen Krankheitsverlauf der Patienten getroffen werden. Bei jedem Patienten kann die Entwicklung des Zustandes über die Zeit allerdings von patientenspezifischen Merkmalen abhängen. Da diese Merkmale den Zustand beeinflussen, empfiehlt es sich in der Studie zusätzlich zu den zeitlich gemessenen Werten Baseline Variablen zu erfassen. Die Entwicklung des Zustandes der Patienten deren Variablen Ähnlichkeiten aufweisen können sich ähneln, sodass sich Patienten in unterschiedliche Gruppen einteilen lassen. Ein naives Beispiel hierfür ist die Unterteilung der Studienteilnehmer in solche die gesund sind und solche die an der zu untersuchenden Krankheit leiden. Das Ziel bei der Analyse solcher Daten ist zum einen den Ornstein-Uhlenbeck Prozess jedes Individuums anhand der Baseline Variablen zu parametrisieren und zum anderen implizit die Gruppenstruktur zu lernen. Dieses setting ist motiviert durch den SMArtCARE Datensatz, welcher Daten zu Patienten enthält die an spinaler Muskelatrophie leiden. Die Patienten lassen sich durch Alter und schwere der Krankheitssymptome in unterschiedliche Gruppen einteilen und die Messungen der motorischen Fähigkeiten weisen individuelle Entwicklungsmuster basierend auf zughörigen Gruppe auf. Außerdem weisen diese Daten eine hohe zeitliche Unregelmäßigkeit auf. 
+\end{document}
